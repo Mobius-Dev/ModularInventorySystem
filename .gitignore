@@ -11,3 +11,5 @@
 *.csproj
 *.unityproj
 *.sln
+
+.vscode/
