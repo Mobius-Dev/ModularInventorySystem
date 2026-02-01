@@ -24,7 +24,7 @@ public class DragManager : MonoBehaviour
     public void StartDragging(Tile tile, PointerEventData eventData)
     {
         _currentTile = tile;
-        _currentTile.LastOccupiedSlot.Content = null; //Free up the previously occupied slot
+        _currentTile.LastOccupiedSlot.TileStored = null; //Free up the previously occupied slot
         _originalParent = tile.transform.parent;
 
         // Move item to the "Drag Layer" so it draws on top of everything

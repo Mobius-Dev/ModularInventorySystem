@@ -1,32 +1,33 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    // This class handles visual representation of an item stack (Content) in the inventory UI
+    // This class handles visual representation of an item stack in the inventory UI
 
-    public ItemDef ItemStored; //What item is stored here
-    public int QuantityStored = 1; //How many units of that item is stored here
+    public Stack StackStored { get; private set; }
 
     public Slot LastOccupiedSlot;
-    //If dragging we need to remember where the tile came from in case no new valid slot for this item is found
+    // If dragging we need to remember where the tile came from in case no new valid slot for this item is found
     // TODO remove hack this shouldnt ever be set manually
 
     [SerializeField] private TextMeshProUGUI _itemCount; //Text element to show the quantity of items in this tile
 
-    public void MergeTogether(Tile otherContent)
-    {
-        QuantityStored += otherContent.QuantityStored;
-
-        RefreshTile();
-        Destroy(otherContent.gameObject);
-    }
+    [UnitHeaderInspectable("Debug")]
+    [SerializeField] ItemDef _itemDef; // TODO Hack
 
     private void Awake()
     {
         if (!LastOccupiedSlot) Debug.LogError($"{gameObject.name} is a stray content tile, this is not allowed!");
         if (!_itemCount) Debug.LogError(($"{gameObject.name} is missing its item count text element!"));
+
+        // TODO Hack
+        if (StackStored == null)
+        {
+            StackStored = new Stack(_itemDef, 1);
+        }
 
         RefreshTile();
     }
@@ -46,9 +47,10 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         DragManager.Instance.FinishDragging(eventData);
     }
 
-    private void RefreshTile()
+    public void RefreshTile()
     {
         //Update the visual representation of this tile based on its current data
-        _itemCount.text = QuantityStored.ToString();
+
+        _itemCount.text = StackStored.QuantityStored.ToString();
     }
 }
