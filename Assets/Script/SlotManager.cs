@@ -20,36 +20,20 @@ public class SlotManager : MonoBehaviour
     {
         // Find and return the best suited slot for given content
 
-        // Create a sorted list of slots to determine the order of checking their validity
-        // TODO in the future, if the slot directly under the conten tile isn't valid, then prioritize nearest stacking possibility rather than an empty slot
+        Slot neareastSlot = _allSlots
+            .OrderBy(item => (item.transform.position - content.transform.position).sqrMagnitude)
+            .ToList()[0]; // Find the slot nearest to where the dragged content tile is
 
-        List<Slot> sortedSlots = CreateSortedList(content.transform.position);
-
-        foreach (Slot slot in sortedSlots)
-        {
-            if (ValidateSlot(slot, content))
-            {
-                return slot;
-            }
-        }
-
-        return null;
+        if (ValidateSlot(neareastSlot, content)) return neareastSlot; // Validate this slot before returning it
+        else return null;
     }
 
     private void Awake()
     {
         // Singleton enforcement
+
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
-    }
-
-    private List<Slot> CreateSortedList(Vector3 coordsToSortBy)
-    {
-        List<Slot> sortedSlots = _allSlots
-            .OrderBy(item => (item.transform.position - coordsToSortBy).sqrMagnitude) // We use squared magnitude rather than distance as an optimization
-            .ToList();
-
-        return sortedSlots;
     }
 
     private bool ValidateSlot(Slot slot, Content contentToValidate)
