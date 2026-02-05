@@ -26,6 +26,6 @@ public class Slot : MonoBehaviour
     // TODO requirements, i.e this slot only accepts weapon-type Content
     private void Awake()
     {
-        SlotManager.Instance.RegisterSlot(this);
+        InventoryManager.Instance.RegisterSlot(this);
     }
 }

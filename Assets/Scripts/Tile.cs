@@ -69,16 +69,16 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Slot _lastOccupied = SlotManager.Instance.GetSlotWithTile(this);
+        Slot _lastOccupied = InventoryManager.Instance.GetSlotWithTile(this);
 
         if (InputManager.Instance.IsSplitModifierPressed() && StackManager.Instance.AttemptSplit(this.StackStored, out Stack splitStack))
         {
-            Tile splitTile = SpawnManager.Instance.SpawnNewItemTile(this.gameObject, splitStack, this.transform.parent);
+            Tile splitTile = SpawnManager.Instance.SpawnTileFromSplitting(this.gameObject, splitStack, this.transform.parent);
             DragManager.Instance.StartDragging(splitTile, _lastOccupied, eventData);
         }
         else
         {
-            SlotManager.Instance.ReleaseSlotFromTile(this);
+            InventoryManager.Instance.ReleaseSlotFromTile(this);
             DragManager.Instance.StartDragging(this, _lastOccupied, eventData);
         }
     }

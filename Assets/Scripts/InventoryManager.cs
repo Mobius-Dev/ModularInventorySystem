@@ -1,11 +1,15 @@
+using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
-public class SlotManager : MonoBehaviour
+public class InventoryManager : MonoBehaviour
 {
     // A singleton which holds knowledge of and runs operations on all inventory slots
-    public static SlotManager Instance { get; private set; }
+    public static InventoryManager Instance { get; private set; }
+
+    [Header("UI References")]
+    [SerializeField] private Button _clearInventoryButton;
 
     private List<Slot> _allSlots = new();
 
@@ -14,6 +18,11 @@ public class SlotManager : MonoBehaviour
         // Singleton enforcement
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
+
+        if (_clearInventoryButton)
+        {
+            _clearInventoryButton.onClick.AddListener(() => EmptyAllSlots());
+        }
     }
 
     public void RegisterSlot(Slot slot)
@@ -46,6 +55,21 @@ public class SlotManager : MonoBehaviour
         return foundSlot;
     }
 
+    public void PlaceTileFromSpawn(Tile tileToPlace)
+    {
+        // Last instead of first so items start appearing in the scene starting from top-left corner, not bottom-right
+        Slot emptySlot = _allSlots.LastOrDefault(slot => slot.TileStored == null);
+
+        if (!emptySlot)
+        {
+            Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!");
+            Destroy(tileToPlace.gameObject);
+            return;
+        }
+
+        emptySlot.TileStored = tileToPlace;
+    }
+
     public void PlaceTileFromDrag(Tile tileToPlace, Slot fallbackSlot)
     {
         Slot selectedSlot = GetClosestSlot(tileToPlace);
@@ -71,6 +95,14 @@ public class SlotManager : MonoBehaviour
                 // Send the whole thing back.
                 SnapTileBack(tileToPlace, fallbackSlot);
                 return;
+        }
+    }
+
+    public void DestroyTile(Tile tileToDestroy)
+    {
+        if (tileToDestroy)
+        {
+            Destroy(tileToDestroy.gameObject);
         }
     }
 
@@ -119,5 +151,17 @@ public class SlotManager : MonoBehaviour
         return _allSlots
             .OrderBy(item => (item.transform.position - tile.transform.position).sqrMagnitude)
             .ToList()[0]; // Find the slot closest to where the given tile is on the screen
+    }
+
+    private void EmptyAllSlots()
+    {
+        foreach (Slot slot in _allSlots)
+        {
+            if (slot.TileStored != null)
+            {
+                Destroy(slot.TileStored.gameObject);
+                slot.TileStored = null;
+            }
+        }
     }
 }

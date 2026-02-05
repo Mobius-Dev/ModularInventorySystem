@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -63,9 +64,34 @@ public class DragManager : MonoBehaviour
     {
         if (_currentTile == null) return;
 
-        SlotManager.Instance.PlaceTileFromDrag(_currentTile, _draggingFrom);
+        if (IsMouseOverTrash(eventData))
+        {
+            // If we release tile above trash bin area, destroy it and free slot
+            InventoryManager.Instance.DestroyTile(_currentTile);
+        }
+        else
+        {
+            InventoryManager.Instance.PlaceTileFromDrag(_currentTile, _draggingFrom);
+        }
 
         _currentTile = null; 
         _draggingFrom = null; // Ready to drag another item
+    }
+
+    private bool IsMouseOverTrash(PointerEventData eventData)
+    {
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            // Check if we hit the Trash Bin object
+            if (result.gameObject.TryGetComponent(out InventoryTrashBin trashBin))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
