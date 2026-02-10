@@ -1,7 +1,9 @@
 using System;
-using UnityEngine;
 
-public class Stack
+/// <summary>
+/// Represents a collection of a specific item and tracks its quantity within the stack.
+/// </summary>
+public class ItemStack
 {
     public ItemDef ItemStored { get; private set; }
 
@@ -20,7 +22,7 @@ public class Stack
 
     public event Action<int> OnQuantityChanged;
 
-    public Stack(ItemDef item, int quantity = 1)
+    public ItemStack(ItemDef item, int quantity = 1)
     {
         ItemStored = item;
         QuantityStored = quantity;

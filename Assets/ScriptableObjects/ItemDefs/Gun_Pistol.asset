@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Gun_Pistol
   m_EditorClassIdentifier: 
   DisplayName: Basic Pistol
-  Type: 0
   ItemID: 0
   Sprite: {fileID: -2709788939841430306, guid: 6d219bbab8ed7f74cb480926272b9176, type: 3}
   MaxStackSize: 4

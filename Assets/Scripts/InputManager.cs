@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Singleton used to manage player input. It provides a centralized way to check for specific input conditions,
+/// such as whether the "split modifier" key is currently pressed.
+/// </summary>
 public class InputManager : MonoBehaviour
 {
 
@@ -15,7 +19,6 @@ public class InputManager : MonoBehaviour
 
     public bool IsSplitModifierPressed()
     {
-        if (Input.GetKey(_splitModifierKey)) Debug.Log("LShift is dectected");
         return Input.GetKey(_splitModifierKey);
     }
 }

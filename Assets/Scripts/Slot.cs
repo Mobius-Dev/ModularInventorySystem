@@ -1,8 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+/// Represents a single slot in the inventory system. Each slot can hold one tile, and is responsible for centering the tile within itself when a tile is assigned to it.
+/// </summary>
 public class Slot : MonoBehaviour
 {
-    // This class handles an slot in the inventory which can store a tile representing a Stack of items
 
     private Tile _tileStored;
 
@@ -13,18 +15,15 @@ public class Slot : MonoBehaviour
         {
             _tileStored = value;
 
-            // Whenever a slot is given a tile, the SLOT ensures the tile behaves
+            // Whenever a slot is given a tile, center the tile in the slot by making it a child and snapping its position
             if (_tileStored != null)
             {
                 _tileStored.transform.SetParent(this.transform);
                 _tileStored.transform.localPosition = Vector3.zero; // Snap!
-                // Note: We don't need to refresh the text, because the Tile handles that itself now!
             }
         }
     }
-
-    // TODO requirements, i.e this slot only accepts weapon-type Content
-    private void Awake()
+    private void Start()
     {
         InventoryManager.Instance.RegisterSlot(this);
     }

@@ -2,9 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Singleton used to handle dragging of UI elements (Tiles) in the inventory system. It manages the drag lifecycle (start, update, finish) an
+/// ensures that dragged items are rendered on top of other UI elements. It also handles dropping items into the trash bin for deletion.
+/// </summary>
 public class DragManager : MonoBehaviour
 {
-    // A singleton which is used to handle dragging of UI elements
     public static DragManager Instance { get; private set; }
 
     [Header("References")]
@@ -13,7 +16,6 @@ public class DragManager : MonoBehaviour
 
     private Tile _currentTile;
     private Slot _draggingFrom;
-    private Transform _originalParent;
     private Vector2 _offset;
 
     private void Awake()
@@ -26,7 +28,6 @@ public class DragManager : MonoBehaviour
     {
         _currentTile = tile;
         _draggingFrom = draggingFrom;
-        _originalParent = tile.transform.parent;
 
         // Move item to the "Drag Layer" so it draws on top of everything
         tile.transform.SetParent(_dragLayer);
@@ -64,18 +65,21 @@ public class DragManager : MonoBehaviour
     {
         if (_currentTile == null) return;
 
+        var inventoryManager = InventoryManager.Instance;
+
         if (IsMouseOverTrash(eventData))
         {
             // If we release tile above trash bin area, destroy it and free slot
-            InventoryManager.Instance.DestroyTile(_currentTile);
+            inventoryManager.DestroyTile(_currentTile);
         }
         else
         {
-            InventoryManager.Instance.PlaceTileFromDrag(_currentTile, _draggingFrom);
+            inventoryManager.PlaceTileFromDrag(_currentTile, _draggingFrom);
         }
 
-        _currentTile = null; 
-        _draggingFrom = null; // Ready to drag another item
+        // Get ready to drag another item
+        _currentTile = null;
+        _draggingFrom = null;
     }
 
     private bool IsMouseOverTrash(PointerEventData eventData)

@@ -3,9 +3,11 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Singleton used to manage the inventory system as a whole. It keeps track of all the slots in the inventory, handles placing and removing tiles from slots
+/// </summary>
 public class InventoryManager : MonoBehaviour
 {
-    // A singleton which holds knowledge of and runs operations on all inventory slots
     public static InventoryManager Instance { get; private set; }
 
     [Header("UI References")]
@@ -29,7 +31,7 @@ public class InventoryManager : MonoBehaviour
     {
         //Called by an instance by Slot when it is created to register itself with the manager
         if (!_allSlots.Contains(slot)) _allSlots.Add(slot);
-        else Debug.LogWarning($"{slot.gameObject.name} tried to register multiple times!");
+        else Debug.LogWarning($"{slot.gameObject.name} tried to register multiple times!", this);
     }
 
     public void ReleaseSlotFromTile(Tile tile)
@@ -44,7 +46,7 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Could not find a slot containing {tile.name}");
+            Debug.LogError($"Could not find a slot containing {tile.name}", this);
         }
     }
 
@@ -62,7 +64,7 @@ public class InventoryManager : MonoBehaviour
 
         if (!emptySlot)
         {
-            Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!");
+            Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!", this);
             Destroy(tileToPlace.gameObject);
             return;
         }
@@ -118,7 +120,7 @@ public class InventoryManager : MonoBehaviour
                 fallbackSlot.TileStored = tileToPlace;
                 break;
             default:
-                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!");
+                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!", this);
                 break;
         }
     }
@@ -148,9 +150,23 @@ public class InventoryManager : MonoBehaviour
     }
     private Slot GetClosestSlot(Tile tile)
     {
-        return _allSlots
-            .OrderBy(item => (item.transform.position - tile.transform.position).sqrMagnitude)
-            .ToList()[0]; // Find the slot closest to where the given tile is on the screen
+        Slot closest = null;
+        float minDistanceSqr = float.MaxValue;
+        Vector3 tilePos = tile.transform.position;
+
+        foreach (Slot slot in _allSlots)
+        {
+            // Optimization: Use sqrMagnitude to avoid square roots
+            float distSqr = (slot.transform.position - tilePos).sqrMagnitude;
+
+            if (distSqr < minDistanceSqr)
+            {
+                minDistanceSqr = distSqr;
+                closest = slot;
+            }
+        }
+
+        return closest;
     }
 
     private void EmptyAllSlots()

@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: Crafting_Metal
   m_EditorClassIdentifier: 
   DisplayName: Metal scraps
-  Type: 2
   ItemID: 1
   Sprite: {fileID: 3763466248922505264, guid: ef9a9eb10ec4c004cb11a2e1190c51c5, type: 3}
   MaxStackSize: 4

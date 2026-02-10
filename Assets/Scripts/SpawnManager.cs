@@ -1,17 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// A singleton containing functionality for spawning game tiles in the environment, allowing instantiation of tiles based on
+/// specified item definitions and quantities.
+/// </summary>
 public class SpawnManager : MonoBehaviour
 {
     public static SpawnManager Instance { get; private set; }
-    public GameObject _tilePrefab; // Prefab used to instantiate new content tiles
+
+    [SerializeField] private GameObject _tilePrefab; // Prefab used to instantiate new content tiles
 
     [Header("UI references")]
-    [SerializeField] private Button _spawnTileButton;
-    //[SerializeField] private Button _clearInventoryButton; move this to slots?
+    [SerializeField] private Button _spawnTileButton; // A button used to spawn a debug tile for testing purposes
 
     [Header("Tile spawning settings")]
-    [SerializeField] private ItemDef _itemToSpawn;
+    [SerializeField] private ItemDef _itemToSpawn; // The item that will be spawned when the spawn button is pressed
     [Min(0)]
     [SerializeField] private int _quantityToSpawn = 1;
 
@@ -25,15 +29,14 @@ public class SpawnManager : MonoBehaviour
             _spawnTileButton.onClick.AddListener(() => SpawnTileFromButton());
         }
     }
-    public Tile SpawnTileFromSplitting(GameObject tileObjToClone, Stack stackToAssign, Transform parentTransform)
+    public Tile SpawnTileFromSplitting(GameObject tileObjToClone, ItemStack stackToAssign, Transform parentTransform)
     {
         // Instantiate a new content tile representing the given item stack under the specified parent transform
         GameObject newTileObj = Instantiate(tileObjToClone, parentTransform);
         Tile newTile = newTileObj.GetComponent<Tile>();
         newTile.AssignStack(stackToAssign);
-        newTile.Initialize();
 
-        return newTileObj.GetComponent<Tile>();
+        return newTile;
     }
 
     private void SpawnTileFromButton()
@@ -43,15 +46,14 @@ public class SpawnManager : MonoBehaviour
         if (_itemToSpawn.MaxStackSize < _quantityToSpawn)
         {
             _quantityToSpawn = _itemToSpawn.MaxStackSize;
-            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.DisplayName} but requested quantity exceeds max stack size, spawning with max stack size instead");
+            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.DisplayName} but requested quantity exceeds max stack size, spawning with max stack size instead", this);
         }
 
         GameObject newTileObj = Instantiate(_tilePrefab);
         Tile newTile = newTileObj.GetComponent<Tile>();
-        Stack debugStack = new Stack(_itemToSpawn, _quantityToSpawn);
+        ItemStack debugStack = new ItemStack(_itemToSpawn, _quantityToSpawn);
 
         newTile.AssignStack(debugStack);
-        newTile.Initialize();
         InventoryManager.Instance.PlaceTileFromSpawn(newTile);
     }
 }

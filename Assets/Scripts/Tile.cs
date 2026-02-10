@@ -1,85 +1,75 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Represents a draggable inventory tile that displays an item stack and supports drag-and-drop operations for
+/// inventory management.
+/// </summary>
 public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    // This class handles visual representation of an item stack in the inventory UI
-    public Stack StackStored { get; private set; }
-
-    public Slot LastOccupiedSlot;
-    // If dragging we need to remember where the tile came from in case no new valid slot for this item is found
-    // TODO remove hack this shouldnt ever be set manually
+    public ItemStack StackStored { get; private set; }
 
     [SerializeField] private Image _image; //Image element to show the item's icon
     [SerializeField] private TextMeshProUGUI _itemCount; //Text element to show the quantity of items in this tile
 
-    [Header("Debug")]
-    [SerializeField] ItemDef _itemDef;
-    [Header("Force count")]
-    [Tooltip("Sets this to positive value to enforce a given item count on awake")]
-    [SerializeField] private int _forceCount = -1;
-
     private void Awake()
     {
-        if (!_itemCount) Debug.LogError(($"{gameObject.name} is missing its item count text element!"));
-        if (!_image) Debug.LogError(($"{gameObject.name} is missing its image element!"));
-
-        Initialize();
+        if (_itemCount == null) Debug.LogError($"{gameObject.name} is missing Item Count Text!", this);
+        if (_image == null) Debug.LogError($"{gameObject.name} is missing Image Component!", this);
     }
-
-    public void Initialize()
+    private void OnDestroy()
     {
-        if (StackStored == null) // TODO Remove Hack
-        {
-            AssignStack(new Stack(_itemDef, 1));
-        }
-        if (_forceCount > 0)
-        {
-            StackStored.QuantityStored = _forceCount;
-            _forceCount = -1; // TODO remove hack
-        }
-
-        _image.sprite = StackStored.ItemStored.Sprite;
-    }
-
-    public void AssignStack(Stack newStack)
-    {
-        // Unsubscribe from old stack to prevent memory leaks/bugs
         if (StackStored != null)
-            StackStored.OnQuantityChanged -= RefreshText;
+        {
+            StackStored.OnQuantityChanged -= HandleQuantityChanged;
+        }
+    }
 
-        // Assign new stack and subscribe to its events
+    public void AssignStack(ItemStack newStack)
+    {
+        // Unsubscribe from old stack to prevent "Zombie" event calls
+        if (StackStored != null)
+        {
+            StackStored.OnQuantityChanged -= HandleQuantityChanged;
+        }
+
         StackStored = newStack;
 
         if (StackStored != null)
         {
-            StackStored.OnQuantityChanged += RefreshText;
+            // Subscribe
+            StackStored.OnQuantityChanged += HandleQuantityChanged;
 
-            // Update immediately for the first time
-            RefreshText(StackStored.QuantityStored);
-        }
-        else
-        {
-            Debug.LogError("Tried to assign a null stack!");
+            // Update Visuals immediately
+            _image.sprite = StackStored.ItemStored.Sprite;
+            HandleQuantityChanged(StackStored.QuantityStored);
         }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Slot _lastOccupied = InventoryManager.Instance.GetSlotWithTile(this);
+        Slot lastOccupied = InventoryManager.Instance.GetSlotWithTile(this);
 
-        if (InputManager.Instance.IsSplitModifierPressed() && StackManager.Instance.AttemptSplit(this.StackStored, out Stack splitStack))
+        // Check for Split (Shift + Drag)
+        if (InputManager.Instance.IsSplitModifierPressed() &&
+            StackManager.Instance.AttemptSplit(this.StackStored, out ItemStack splitStack))
         {
-            Tile splitTile = SpawnManager.Instance.SpawnTileFromSplitting(this.gameObject, splitStack, this.transform.parent);
-            DragManager.Instance.StartDragging(splitTile, _lastOccupied, eventData);
+            // Spawn the visual representation of the split stack
+            // Note: We pass the parent of the current tile to keep hierarchy clean
+            Tile splitTile = SpawnManager.Instance.SpawnTileFromSplitting(
+                gameObject,
+                splitStack,
+                transform.parent);
+
+            DragManager.Instance.StartDragging(splitTile, lastOccupied, eventData);
         }
         else
         {
+            // Standard Drag
             InventoryManager.Instance.ReleaseSlotFromTile(this);
-            DragManager.Instance.StartDragging(this, _lastOccupied, eventData);
+            DragManager.Instance.StartDragging(this, lastOccupied, eventData);
         }
     }
 
@@ -93,7 +83,7 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         DragManager.Instance.FinishDragging(eventData);
     }
 
-    private void RefreshText(int quantity)
+    private void HandleQuantityChanged(int quantity)
     {
         _itemCount.text = quantity.ToString();
     }
