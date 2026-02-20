@@ -57,7 +57,7 @@ public class SpawnManager : MonoBehaviour
         if (_itemToSpawn.MaxStackSize < _quantityToSpawn)
         {
             _quantityToSpawn = _itemToSpawn.MaxStackSize;
-            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.ItemName} but requested quantity exceeds max stack size, spawning with max stack size instead", this);
+            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.ItemID} but requested quantity exceeds max stack size, spawning with max stack size instead", this);
         }
 
         GameObject newTileObj = Instantiate(_tilePrefab);

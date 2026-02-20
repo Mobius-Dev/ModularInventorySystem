@@ -11,22 +11,28 @@ using UnityEngine;
 public class InventoryRepository
 {
     private readonly IJsonFileReader _fileReader;
+    private readonly IJsonFileWriter _fileWriter;
     private readonly string _saveFileName = "inventory_data.json";
 
-    public InventoryRepository(IJsonFileReader fileReader)
+    public InventoryRepository(IJsonFileReader fileReader, IJsonFileWriter fileWriter   )
     {
         _fileReader = fileReader;
+        _fileWriter = fileWriter;
     }
 
     public async Task<InventorySaveData> LoadInventoryAsync()
     {
-        // Get the full path to the inventory save file
         string path = GetPath();
 
         var data = await _fileReader.ReadAsync<InventorySaveData>(path);
         return data;
     }
+    public async Task SaveInventoryAsync(InventorySaveData data)
+    {
+        string path = GetPath();
 
+        await _fileWriter.WriteAsync(path, data);
+    }
     public bool FileExists()
     {
         return File.Exists(GetPath());
@@ -34,6 +40,7 @@ public class InventoryRepository
 
     private string GetPath()
     {
+        // Combines the persistent data path with the save file name to get the full path to the inventory save file
         return Path.Combine(Application.persistentDataPath, _saveFileName);
     }
 }

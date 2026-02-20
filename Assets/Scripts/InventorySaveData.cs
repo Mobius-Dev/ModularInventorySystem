@@ -11,5 +11,5 @@ public class InventorySaveData
 public class ItemStackData // A simple serializable class representing an item stack. This is what we will actually save to JSON for each stack in the inventory
 {
     public string ItemID;
-    public int ItemQuantity;
+    public int QuantityStored;
 }

@@ -20,15 +20,15 @@ public class ItemDatabase : ScriptableObject
         _lookup = new Dictionary<string, ItemDef>();
         foreach (var item in AllItems)
         {
-            if (item != null && !string.IsNullOrEmpty(item.ItemName))
+            if (item != null && !string.IsNullOrEmpty(item.ItemID))
             {
-                if (!_lookup.ContainsKey(item.ItemName))
+                if (!_lookup.ContainsKey(item.ItemID))
                 {
-                    _lookup.Add(item.ItemName, item);
+                    _lookup.Add(item.ItemID, item);
                 }
                 else
                 {
-                    Debug.LogWarning($"Duplicate Item ID found: {item.ItemName} on {item.name}");
+                    Debug.LogWarning($"Duplicate Item ID found: {item.ItemID} on {item.name}");
                 }
             }
         }

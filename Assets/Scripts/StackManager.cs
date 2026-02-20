@@ -18,7 +18,7 @@ public class StackManager : MonoBehaviour
     {
         // Attempt to merge stackB into stackA
 
-        if (stackA.ItemStored.ItemName == stackB.ItemStored.ItemName)
+        if (stackA.ItemStored.ItemID == stackB.ItemStored.ItemID)
         {
             int totalQuantity = stackA.QuantityStored + stackB.QuantityStored;
 

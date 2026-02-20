@@ -11,8 +11,9 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager Instance { get; private set; }
 
     [Header("UI References")]
-    [SerializeField] private Button _clearInventoryButton; // Button for deleting all items from inventory
+    [SerializeField] private Button _clearInventoryButton;
     [SerializeField] private Button _loadDataButton; // Button for loading inventory from JSON
+    [SerializeField] private Button _saveDataButton; // Button for saving inventory to JSON
 
     [Header("Database References")]
     [SerializeField] private ItemDatabase _itemDatabase; // Reference to the item database ScriptableObject
@@ -29,13 +30,19 @@ public class InventoryManager : MonoBehaviour
         if (_clearInventoryButton)
         {
             _clearInventoryButton.onClick.AddListener(() => EmptyAllSlots());
+        }
+        if (_loadDataButton) {
             _loadDataButton.onClick.AddListener(() => LoadInventoryData());
+        }
+        if (_saveDataButton) {
+            _saveDataButton.onClick.AddListener(() => SaveInventoryData());
         }
 
         // Dependency Injection (Manual)
         // We create the tools we need.
         IJsonFileReader reader = new LocalJsonFileReader();
-        _repository = new InventoryRepository(reader);
+        IJsonFileWriter writer = new LocalJsonFileWriter();
+        _repository = new InventoryRepository(reader, writer);
 
         // Check if we have data to load
         // TODO UI integration: For now, it's here so you can see how loading works without needing to create UI for it.
@@ -206,7 +213,7 @@ public class InventoryManager : MonoBehaviour
         {
             ItemDef realItemDef = _itemDatabase.GetItemByID(itemData.ItemID);
 
-            ItemStack newStack = new ItemStack(realItemDef, itemData.ItemQuantity);
+            ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
 
             Tile reconstructedTile = SpawnManager.Instance.SpawnTileFromLoad(newStack);
 
@@ -223,6 +230,36 @@ public class InventoryManager : MonoBehaviour
         {
             ReconstructInventory(data);
         }
+    }
+
+    public async void SaveInventoryData()
+    {
+        InventorySaveData saveData = new InventorySaveData();
+
+        // Iterate through slots, find the ones with tiles, and create ItemStackData for each to be saved
+        foreach (Slot slot in _allSlots)
+        {
+            if (slot.TileStored != null)
+            {
+                ItemStack stack = slot.TileStored.StackStored;
+
+
+                ItemStackData itemData = new ItemStackData
+                {
+                    // We save the ID (String), not the ScriptableObject itself!
+                    ItemID = stack.ItemStored.ItemID,
+                    QuantityStored = stack.QuantityStored
+                };
+
+                // Add it to the list to be saved
+                saveData.ItemStacks.Add(itemData);
+            }
+        }
+
+        // Hand off the data to the file system
+        await _repository.SaveInventoryAsync(saveData);
+
+        Debug.Log("Inventory Saved Successfully!");
     }
 
     private void CheckInventoryDataExists()
