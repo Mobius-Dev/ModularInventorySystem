@@ -34,6 +34,17 @@ public class SpawnManager : MonoBehaviour
         // Instantiate a new content tile representing the given item stack under the specified parent transform
         GameObject newTileObj = Instantiate(tileObjToClone, parentTransform);
         Tile newTile = newTileObj.GetComponent<Tile>();
+
+        newTile.AssignStack(stackToAssign);
+
+        return newTile;
+    }
+
+    public Tile SpawnTileFromLoad(ItemStack stackToAssign)
+    {
+        GameObject newTileObj = Instantiate(_tilePrefab);
+        Tile newTile = newTileObj.GetComponent<Tile>();
+
         newTile.AssignStack(stackToAssign);
 
         return newTile;
@@ -46,7 +57,7 @@ public class SpawnManager : MonoBehaviour
         if (_itemToSpawn.MaxStackSize < _quantityToSpawn)
         {
             _quantityToSpawn = _itemToSpawn.MaxStackSize;
-            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.DisplayName} but requested quantity exceeds max stack size, spawning with max stack size instead", this);
+            Debug.LogWarning($"Spawning a tile of {_itemToSpawn.ItemName} but requested quantity exceeds max stack size, spawning with max stack size instead", this);
         }
 
         GameObject newTileObj = Instantiate(_tilePrefab);

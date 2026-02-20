@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Singleton used to manage the inventory system as a whole. It keeps track of all the slots in the inventory, handles placing and removing tiles from slots
@@ -11,9 +11,14 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager Instance { get; private set; }
 
     [Header("UI References")]
-    [SerializeField] private Button _clearInventoryButton;
+    [SerializeField] private Button _clearInventoryButton; // Button for deleting all items from inventory
+    [SerializeField] private Button _loadDataButton; // Button for loading inventory from JSON
+
+    [Header("Database References")]
+    [SerializeField] private ItemDatabase _itemDatabase; // Reference to the item database ScriptableObject
 
     private List<Slot> _allSlots = new();
+    private InventoryRepository _repository;
 
     private void Awake()
     {
@@ -24,7 +29,17 @@ public class InventoryManager : MonoBehaviour
         if (_clearInventoryButton)
         {
             _clearInventoryButton.onClick.AddListener(() => EmptyAllSlots());
+            _loadDataButton.onClick.AddListener(() => LoadInventoryData());
         }
+
+        // Dependency Injection (Manual)
+        // We create the tools we need.
+        IJsonFileReader reader = new LocalJsonFileReader();
+        _repository = new InventoryRepository(reader);
+
+        // Check if we have data to load
+        // TODO UI integration: For now, it's here so you can see how loading works without needing to create UI for it.
+        CheckInventoryDataExists();
     }
 
     public void RegisterSlot(Slot slot)
@@ -178,6 +193,47 @@ public class InventoryManager : MonoBehaviour
                 Destroy(slot.TileStored.gameObject);
                 slot.TileStored = null;
             }
+        }
+    }
+
+    private void ReconstructInventory(InventorySaveData data)
+    {
+        // Clear existing inventory before reconstruction
+        EmptyAllSlots();
+
+        // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
+        foreach (var itemData in data.ItemStacks)
+        {
+            ItemDef realItemDef = _itemDatabase.GetItemByID(itemData.ItemID);
+
+            ItemStack newStack = new ItemStack(realItemDef, itemData.ItemQuantity);
+
+            Tile reconstructedTile = SpawnManager.Instance.SpawnTileFromLoad(newStack);
+
+            PlaceTileFromSpawn(reconstructedTile);
+        }
+    }
+
+    private async void LoadInventoryData()
+    {
+        Debug.Log("Loading Inventory...");
+        InventorySaveData data = await _repository.LoadInventoryAsync();
+
+        if (data != null)
+        {
+            ReconstructInventory(data);
+        }
+    }
+
+    private void CheckInventoryDataExists()
+    {
+        if (_repository.FileExists())
+        {
+            Debug.Log("Inventory data file found. Ready to load inventory.");
+        }
+        else
+        {
+            Debug.LogWarning("No inventory data file found.");
         }
     }
 }

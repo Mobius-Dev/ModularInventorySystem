@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 375a442d14b409b4fb8b64c26ea08dc3, type: 3}
-  m_Name: Gun_Pistol
+  m_Script: {fileID: 11500000, guid: 8918c63793e11c548bb9d9756bb0b035, type: 3}
+  m_Name: DefaultItemDB
   m_EditorClassIdentifier: 
-  ItemName: Gun_Pistol
-  Sprite: {fileID: -2709788939841430306, guid: 6d219bbab8ed7f74cb480926272b9176, type: 3}
-  MaxStackSize: 4
+  AllItems:
+  - {fileID: 11400000, guid: 5753e1d6d7bf3184087eae31c50e72a1, type: 2}
+  - {fileID: 11400000, guid: cb6aade6d598e1948947696a6b19e0f0, type: 2}
