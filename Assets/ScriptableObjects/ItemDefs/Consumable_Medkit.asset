@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 375a442d14b409b4fb8b64c26ea08dc3, type: 3}
-  m_Name: Crafting_Metal
+  m_Name: Consumable_Medkit
   m_EditorClassIdentifier: 
-  ItemDisplayName: Metal
-  ItemID: Crafting_Metal
-  Sprite: {fileID: -3407685708110407838, guid: c849c0489b3073e4ba75198ae7d01594, type: 3}
-  MaxStackSize: 16
+  ItemDisplayName: Medkit
+  ItemID: Consumable_Medkit
+  Sprite: {fileID: -5960325681051165623, guid: 92c6d171770fa574293141459c65db38, type: 3}
+  MaxStackSize: 4

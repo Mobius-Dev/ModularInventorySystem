@@ -11,13 +11,16 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 {
     public ItemStack StackStored { get; private set; }
 
-    [SerializeField] private Image _image; //Image element to show the item's icon
-    [SerializeField] private TextMeshProUGUI _itemCount; //Text element to show the quantity of items in this tile
+    [Header("UI References")]
+    [SerializeField] private Image _image; // Image element to show the item's icon
+    [SerializeField] private TextMeshProUGUI _itemCount; // Text element to show the quantity of items in this tile
+    [SerializeField] private TextMeshProUGUI _itemName; // Text element to show the name of the item in this tile (optional)
 
     private void Awake()
     {
         if (_itemCount == null) Debug.LogError($"{gameObject.name} is missing Item Count Text!", this);
         if (_image == null) Debug.LogError($"{gameObject.name} is missing Image Component!", this);
+        if (_itemName == null) Debug.LogWarning($"{gameObject.name} is missing Item Name Text! This is optional, but can be useful for debugging.", this);
     }
     private void OnDestroy()
     {
@@ -44,6 +47,7 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
             // Update Visuals immediately
             _image.sprite = StackStored.ItemStored.Sprite;
+            _itemName.text = StackStored.ItemStored.ItemDisplayName;
             HandleQuantityChanged(StackStored.QuantityStored);
         }
     }
