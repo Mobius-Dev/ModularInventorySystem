@@ -15,9 +15,6 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Button _loadDataButton; // Button for loading inventory from JSON
     [SerializeField] private Button _saveDataButton; // Button for saving inventory to JSON
 
-    [Header("Database References")]
-    [SerializeField] private ItemDatabase _itemDatabase; // Reference to the item database ScriptableObject
-
     private List<Slot> _allSlots = new();
     private InventoryRepository _repository;
 
@@ -211,7 +208,7 @@ public class InventoryManager : MonoBehaviour
         // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
         foreach (var itemData in data.ItemStacks)
         {
-            ItemDef realItemDef = _itemDatabase.GetItemByID(itemData.ItemID);
+            ItemDef realItemDef = GameManager.Instance.ItemDatabase.GetItemByID(itemData.ItemID);
 
             ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
 

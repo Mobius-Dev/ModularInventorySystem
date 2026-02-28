@@ -9,16 +9,21 @@ using System.Linq;
 [CreateAssetMenu(menuName = "Inventory/Item Database")]
 public class ItemDatabase : ScriptableObject
 {
-    public List<ItemDef> AllItems;
+    private List<ItemDef> _allItems;
 
     // Optimization: A Dictionary is faster than a List for lookups
     private Dictionary<string, ItemDef> _lookup;
+    public List<ItemDef> AllItems
+    {
+        get { return _allItems; }
+        private set { _allItems = value; }
+    }
 
     public void Init()
     {
         // Convert the List to a Dictionary for instant access
         _lookup = new Dictionary<string, ItemDef>();
-        foreach (var item in AllItems)
+        foreach (var item in _allItems)
         {
             if (item != null && !string.IsNullOrEmpty(item.ItemID))
             {
@@ -53,7 +58,7 @@ public class ItemDatabase : ScriptableObject
     [ContextMenu("Load All Items From Project")]
     public void LoadAllItems()
     {
-        AllItems = new List<ItemDef>();
+        _allItems = new List<ItemDef>();
 
         // Find all ScriptableObjects of type ItemDef in the project
         string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDef");
@@ -62,13 +67,13 @@ public class ItemDatabase : ScriptableObject
         {
             string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
             ItemDef item = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDef>(path);
-            AllItems.Add(item);
+            _allItems.Add(item);
         }
 
         // Mark the database as dirty to ensure it gets saved
         UnityEditor.EditorUtility.SetDirty(this); 
 
-        Debug.Log($"Loaded {AllItems.Count} items into the database.");
+        Debug.Log($"Loaded {_allItems.Count} items into the database.");
     }
 #endif
 }

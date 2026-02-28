@@ -1246,6 +1246,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 370192280}
   m_CullTransparentMesh: 1
+--- !u!1 &452889624
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 452889626}
+  - component: {fileID: 452889625}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &452889625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 452889624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82d4ea4b6dbd038429751c9fcd440976, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _itemDatabase: {fileID: 11400000, guid: 2320367aa3c0eb040abaaf6c27e88c2d, type: 2}
+--- !u!4 &452889626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 452889624}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 697.2427, y: 325.05954, z: -4.5776377}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &458829640
 GameObject:
   m_ObjectHideFlags: 0
@@ -1566,7 +1611,6 @@ MonoBehaviour:
   _clearInventoryButton: {fileID: 216274478}
   _loadDataButton: {fileID: 1714648832}
   _saveDataButton: {fileID: 1840997525}
-  _itemDatabase: {fileID: 11400000, guid: 2320367aa3c0eb040abaaf6c27e88c2d, type: 2}
 --- !u!1 &544529880
 GameObject:
   m_ObjectHideFlags: 0
@@ -2084,6 +2128,7 @@ GameObject:
   - component: {fileID: 687367615}
   - component: {fileID: 687367614}
   - component: {fileID: 687367613}
+  - component: {fileID: 687367616}
   m_Layer: 5
   m_Name: Dropdown_SpawnItem
   m_TagString: Untagged
@@ -2163,16 +2208,7 @@ MonoBehaviour:
   m_Value: 0
   m_MultiSelect: 0
   m_Options:
-    m_Options:
-    - m_Text: Crafting_Metal
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Gun_Pistol
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
-    - m_Text: Consumable_Medkit
-      m_Image: {fileID: 0}
-      m_Color: {r: 1, g: 1, b: 1, a: 1}
+    m_Options: []
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2215,6 +2251,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 687367611}
   m_CullTransparentMesh: 1
+--- !u!114 &687367616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687367611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1b8afb550b883e46b2662b4756a91b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &698439736
 GameObject:
   m_ObjectHideFlags: 0
@@ -3338,7 +3386,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Crafting_Metal
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3365,7 +3413,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.95
+  m_fontSize: 18
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3863,7 +3911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tilePrefab: {fileID: 6540773721903186169, guid: 1f0bbb8cc59bb8344be6d3b1b78e4890, type: 3}
   _spawnTileButton: {fileID: 565215238}
-  _itemToSpawn: {fileID: 11400000, guid: 5753e1d6d7bf3184087eae31c50e72a1, type: 2}
+  _itemSelectionDropdown: {fileID: 687367613}
   _quantityToSpawn: 1
 --- !u!1 &1498654818
 GameObject:
@@ -5361,6 +5409,7 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 1716333939}
+  - {fileID: 452889626}
   - {fileID: 1138537028}
   - {fileID: 1914282540}
   - {fileID: 2132776627}
