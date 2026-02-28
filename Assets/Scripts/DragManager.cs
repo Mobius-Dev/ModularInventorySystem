@@ -69,7 +69,8 @@ public class DragManager : MonoBehaviour
 
         if (IsMouseOverTrash(eventData))
         {
-            // If we release tile above trash bin area, destroy it and free slot
+            // If we release tile above trash bin area, destroy it
+            NotificationBus.PostMessage($"Deleted a stack of {_currentTile.StackStored.ItemStored.ItemDisplayName} with {_currentTile.StackStored.QuantityStored} items");
             inventoryManager.DestroyTile(_currentTile);
         }
         else

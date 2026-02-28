@@ -28,7 +28,7 @@ public class SpawnManager : MonoBehaviour
         if (Instance != null && Instance != this) Destroy(this);
         else Instance = this;
 
-        if (_spawnTileButton) _spawnTileButton.onClick.AddListener(() => SpawnTileFromButton());
+        if (_spawnTileButton) _spawnTileButton.onClick.AddListener(() => OnSpawnButtonClicked());
         else Debug.LogError("SpawnManager is missing a reference to the Spawn Tile Button, spawning via button will not work", this);
 
         if (_itemSelectionDropdown)
@@ -60,7 +60,7 @@ public class SpawnManager : MonoBehaviour
         return newTile;
     }
 
-    private void SpawnTileFromButton()
+    private void OnSpawnButtonClicked()
     {
         // Spawns a debug item tile for testing purposes
 

@@ -84,11 +84,13 @@ public class InventoryManager : MonoBehaviour
         if (!emptySlot)
         {
             Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!", this);
+            NotificationBus.PostMessage($"No empty slots available for {tileToPlace.StackStored.ItemStored.ItemDisplayName}!");
             Destroy(tileToPlace.gameObject);
             return;
         }
 
         emptySlot.TileStored = tileToPlace;
+        NotificationBus.PostMessage($"Spawned a new {tileToPlace.StackStored.ItemStored.ItemDisplayName} into slot {emptySlot.name}");
     }
 
     public void PlaceTileFromDrag(Tile tileToPlace, Slot fallbackSlot)
@@ -104,6 +106,7 @@ public class InventoryManager : MonoBehaviour
                 return;
             case PlacementResult.MovedToEmpty:
                 selectedSlot.TileStored = tileToPlace;
+                NotificationBus.PostMessage($"Placed {tileToPlace.StackStored.ItemStored.ItemDisplayName} into an empty slot {selectedSlot.name}");
                 break;
             case PlacementResult.MergedPartially:
                 // Partial Success: We merged some, but have leftovers.
@@ -198,6 +201,7 @@ public class InventoryManager : MonoBehaviour
                 slot.TileStored = null;
             }
         }
+        NotificationBus.PostMessage("Emptied all inventory slots");
     }
 
     private void ReconstructInventory(InventorySaveData data)
@@ -226,7 +230,9 @@ public class InventoryManager : MonoBehaviour
         if (data != null)
         {
             ReconstructInventory(data);
+            NotificationBus.PostMessage("Inventory Loaded Successfully");
         }
+        else NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted");
     }
 
     public async void SaveInventoryData()
@@ -257,6 +263,7 @@ public class InventoryManager : MonoBehaviour
         await _repository.SaveInventoryAsync(saveData);
 
         Debug.Log("Inventory Saved Successfully!");
+        NotificationBus.PostMessage("Inventory Saved Successfully");
     }
 
     private void CheckInventoryDataExists()
