@@ -123,6 +123,26 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    private void PlaceTileFromLoad(Tile tileToPlace, int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= _allSlots.Count)
+        {
+            Debug.LogError($"Invalid slot index {slotIndex} for placing loaded tile {tileToPlace.name}. This should never happen if the save/load system is working correctly.", this);
+            Destroy(tileToPlace.gameObject);
+            return;
+        }
+
+        Slot targetSlot = _allSlots[slotIndex];
+        if (targetSlot.TileStored != null)
+        {
+            Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied by {targetSlot.TileStored.name}. This should never happen if the save/load system is working correctly. Destroying the tile to prevent issues.", this);
+            Destroy(tileToPlace.gameObject);
+            return;
+        }
+
+        targetSlot.TileStored = tileToPlace;
+    }
+
     private void SnapTileBack(Tile tileToPlace, Slot fallbackSlot)
     {
         PlacementResult placementResult = TryPlaceTileAt(fallbackSlot, tileToPlace);
@@ -211,7 +231,7 @@ public class InventoryManager : MonoBehaviour
 
             Tile reconstructedTile = SpawnManager.Instance.SpawnTileFromLoad(newStack);
 
-            PlaceTileFromSpawn(reconstructedTile);
+            PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }
     }
 
@@ -233,17 +253,19 @@ public class InventoryManager : MonoBehaviour
         InventorySaveData saveData = new InventorySaveData();
 
         // Iterate through slots, find the ones with tiles, and create ItemStackData for each to be saved
-        foreach (Slot slot in _allSlots)
+        for (int i = 0; i < _allSlots.Count; i++)
         {
+            // Grab the current slot using the index 'i'
+            Slot slot = _allSlots[i];
+
             if (slot.TileStored != null)
             {
                 ItemStack stack = slot.TileStored.StackStored;
 
-
                 ItemStackData itemData = new ItemStackData
                 {
-                    // We save the ID (String), not the ScriptableObject itself!
                     ItemID = stack.ItemStored.ItemID,
+                    SlotIndex = i,
                     QuantityStored = stack.QuantityStored
                 };
 

@@ -5,8 +5,6 @@ using UnityEngine;
 /// </summary>
 public class Slot : MonoBehaviour
 {
-    public int SlotID; // Unique identifier for this slot
-
     private Tile _tileStored;
 
     public Tile TileStored
