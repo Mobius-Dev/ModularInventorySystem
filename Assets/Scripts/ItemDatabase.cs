@@ -9,7 +9,7 @@ using System.Linq;
 [CreateAssetMenu(menuName = "Inventory/Item Database")]
 public class ItemDatabase : ScriptableObject
 {
-    private List<ItemDef> _allItems;
+    [SerializeField] private List<ItemDef> _allItems;
 
     // Optimization: A Dictionary is faster than a List for lookups
     private Dictionary<string, ItemDef> _lookup;
