@@ -15,7 +15,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Button _loadDataButton; // Button for loading inventory from JSON
     [SerializeField] private Button _saveDataButton; // Button for saving inventory to JSON
 
-    private List<Slot> _allSlots = new();
+    [SerializeField] private List<Slot> _allSlots = new();
     private InventoryRepository _repository;
 
     private void Awake()
@@ -44,13 +44,6 @@ public class InventoryManager : MonoBehaviour
         // Check if we have data to load
         // TODO UI integration: For now, it's here so you can see how loading works without needing to create UI for it.
         CheckInventoryDataExists();
-    }
-
-    public void RegisterSlot(Slot slot)
-    {
-        //Called by an instance by Slot when it is created to register itself with the manager
-        if (!_allSlots.Contains(slot)) _allSlots.Add(slot);
-        else Debug.LogWarning($"{slot.gameObject.name} tried to register multiple times!", this);
     }
 
     public void ReleaseSlotFromTile(Tile tile)
@@ -277,4 +270,18 @@ public class InventoryManager : MonoBehaviour
             Debug.LogWarning("No inventory data file found.");
         }
     }
+
+#if UNITY_EDITOR
+    [ContextMenu("Find And Register All Slots")]
+    private void SetupSlotsFromEditor()
+    {
+        var foundSlots = FindObjectsByType<Slot>(FindObjectsSortMode.None);
+
+        _allSlots = foundSlots.OrderBy(s => s.transform.GetSiblingIndex()).Reverse().ToList();
+
+        UnityEditor.EditorUtility.SetDirty(this);
+
+        Debug.Log($"Successfully found and registered {_allSlots.Count} Slots!", this);
+    }
+#endif
 }

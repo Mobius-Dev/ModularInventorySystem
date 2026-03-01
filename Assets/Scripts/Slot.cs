@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public class Slot : MonoBehaviour
 {
+    public int SlotID; // Unique identifier for this slot
 
     private Tile _tileStored;
 
@@ -22,9 +23,5 @@ public class Slot : MonoBehaviour
                 _tileStored.transform.localPosition = Vector3.zero; // Snap!
             }
         }
-    }
-    private void Start()
-    {
-        InventoryManager.Instance.RegisterSlot(this);
     }
 }
