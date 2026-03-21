@@ -169,7 +169,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         // Handle Occupied Slot (Attempt Merge)
-        if (!StackManager.Instance.AttemptMerge(targetSlot.TileStored.StackStored, targetTile.StackStored))
+        if (!StackUtility.AttemptMerge(targetSlot.TileStored.StackStored, targetTile.StackStored))
         {
             return PlacementResult.Failed;
         }

@@ -58,7 +58,7 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
         // Check for Split (Shift + Drag)
         if (InputManager.Instance.IsSplitModifierPressed() &&
-            StackManager.Instance.AttemptSplit(this.StackStored, out ItemStack splitStack))
+            StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
         {
             // Spawn the visual representation of the split stack
             // Note: We pass the parent of the current tile to keep hierarchy clean

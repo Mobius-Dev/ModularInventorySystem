@@ -1,20 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Provides centralized management for item stacks, including functionality to merge and split stacks within an
+/// Provides functionality to merge and split stacks within an
 /// inventory system.
 /// </summary>
-public class StackManager : MonoBehaviour
+public static class StackUtility
 {
-    public static StackManager Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this) Destroy(this);
-        else Instance = this;
-    }
-
-    public bool AttemptMerge(ItemStack stackA, ItemStack stackB)
+    public static bool AttemptMerge(ItemStack stackA, ItemStack stackB)
     {
         // Attempt to merge stackB into stackA
 
@@ -54,7 +46,7 @@ public class StackManager : MonoBehaviour
         return false;
     }
 
-    public bool AttemptSplit(ItemStack originalStack, out ItemStack newStack)
+    public static bool AttemptSplit(ItemStack originalStack, out ItemStack newStack)
     {
         // Attempt to split the original stack into two stacks of equal quantity
 
