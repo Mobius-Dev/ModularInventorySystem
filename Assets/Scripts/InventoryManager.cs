@@ -8,7 +8,6 @@ using UnityEngine.UI;
 /// </summary>
 public class InventoryManager : MonoBehaviour
 {
-    public static InventoryManager Instance { get; private set; }
 
     [Header("UI References")]
     [SerializeField] private Button _clearInventoryButton;
@@ -20,10 +19,6 @@ public class InventoryManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton enforcement
-        if (Instance != null && Instance != this) Destroy(this);
-        else Instance = this;
-
         if (_clearInventoryButton)
         {
             _clearInventoryButton.onClick.AddListener(() => EmptyAllSlots());
@@ -225,11 +220,11 @@ public class InventoryManager : MonoBehaviour
         // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
         foreach (var itemData in data.ItemStacks)
         {
-            ItemDef realItemDef = GameManager.Instance.ItemDatabase.GetItemByID(itemData.ItemID);
+            ItemDef realItemDef = ServiceLocator.Get<ItemDatabase>().GetItemByID(itemData.ItemID);
 
             ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
 
-            Tile reconstructedTile = SpawnManager.Instance.SpawnTileFromLoad(newStack);
+            Tile reconstructedTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromLoad(newStack);
 
             PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }

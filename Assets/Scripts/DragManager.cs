@@ -8,8 +8,6 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class DragManager : MonoBehaviour
 {
-    public static DragManager Instance { get; private set; }
-
     [Header("References")]
     [SerializeField] private Canvas _mainCanvas;
     [SerializeField] private RectTransform _dragLayer;
@@ -17,12 +15,6 @@ public class DragManager : MonoBehaviour
     private Tile _currentTile;
     private Slot _draggingFrom;
     private Vector2 _offset;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this) Destroy(this);
-        else Instance = this;
-    }
 
     public void StartDragging(Tile tile, Slot draggingFrom, PointerEventData eventData)
     {
@@ -65,7 +57,7 @@ public class DragManager : MonoBehaviour
     {
         if (_currentTile == null) return;
 
-        var inventoryManager = InventoryManager.Instance;
+        var inventoryManager = ServiceLocator.Get<InventoryManager>();
 
         if (IsMouseOverTrash(eventData))
         {

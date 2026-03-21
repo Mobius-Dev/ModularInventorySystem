@@ -1,3 +1,4 @@
+using NUnit.Framework.Interfaces;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,8 +10,6 @@ using UnityEngine.UI;
 /// </summary>
 public class SpawnManager : MonoBehaviour
 {
-    public static SpawnManager Instance { get; private set; }
-
     [SerializeField] private GameObject _tilePrefab; // Prefab used to instantiate new content tiles
 
     [Header("UI references")]
@@ -25,9 +24,6 @@ public class SpawnManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(this);
-        else Instance = this;
-
         if (_spawnTileButton) _spawnTileButton.onClick.AddListener(() => OnSpawnButtonClicked());
         else Debug.LogError("SpawnManager is missing a reference to the Spawn Tile Button, spawning via button will not work", this);
 
@@ -81,7 +77,7 @@ public class SpawnManager : MonoBehaviour
         ItemStack debugStack = new ItemStack(_itemToSpawn, _quantityToSpawn);
 
         newTile.AssignStack(debugStack);
-        InventoryManager.Instance.PlaceTileFromSpawn(newTile);
+        ServiceLocator.Get<InventoryManager>().PlaceTileFromSpawn(newTile);
     }
 
     private void OnItemSelected(int index)
@@ -94,7 +90,7 @@ public class SpawnManager : MonoBehaviour
     {
         if (_itemNameToID.TryGetValue(itemName, out string itemID))
         {
-            _itemToSpawn = GameManager.Instance.ItemDatabase.GetItemByID(itemID);
+            _itemToSpawn = ServiceLocator.Get<ItemDatabase>().GetItemByID(itemID);
         }
         else
         {
@@ -108,7 +104,7 @@ public class SpawnManager : MonoBehaviour
 
         List<TMP_Dropdown.OptionData> uiOptions = new List<TMP_Dropdown.OptionData>();
 
-        foreach (var entry in GameManager.Instance.ItemDatabase.AllItems)
+        foreach (var entry in ServiceLocator.Get<ItemDatabase>().AllItems)
         {
             // Add the readable name to the UI list
             string name = entry.ItemDisplayName;

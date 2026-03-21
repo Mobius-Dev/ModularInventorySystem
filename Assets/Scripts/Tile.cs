@@ -54,37 +54,37 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Slot lastOccupied = InventoryManager.Instance.GetSlotWithTile(this);
+        Slot lastOccupied = ServiceLocator.Get<InventoryManager>().GetSlotWithTile(this);
 
         // Check for Split (Shift + Drag)
-        if (InputManager.Instance.IsSplitModifierPressed() &&
+        if (InputUtility.IsSplitModifierPressed() &&
             StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
         {
             // Spawn the visual representation of the split stack
             // Note: We pass the parent of the current tile to keep hierarchy clean
-            Tile splitTile = SpawnManager.Instance.SpawnTileFromSplitting(
+            Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
                 gameObject,
                 splitStack,
                 transform.parent);
 
-            DragManager.Instance.StartDragging(splitTile, lastOccupied, eventData);
+            ServiceLocator.Get<DragManager>().StartDragging(splitTile, lastOccupied, eventData);
         }
         else
         {
             // Standard Drag
-            InventoryManager.Instance.ReleaseSlotFromTile(this);
-            DragManager.Instance.StartDragging(this, lastOccupied, eventData);
+            ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(this);
+            ServiceLocator.Get<DragManager>().StartDragging(this, lastOccupied, eventData);
         }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        DragManager.Instance.UpdatePosition(eventData);
+        ServiceLocator.Get<DragManager>().UpdatePosition(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        DragManager.Instance.FinishDragging(eventData);
+        ServiceLocator.Get<DragManager>().FinishDragging(eventData);
     }
 
     private void HandleQuantityChanged(int quantity)
