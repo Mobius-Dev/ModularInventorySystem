@@ -4034,9 +4034,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tilePrefab: {fileID: 6540773721903186169, guid: 1f0bbb8cc59bb8344be6d3b1b78e4890, type: 3}
-  _spawnTileButton: {fileID: 565215238}
-  _itemSelectionDropdown: {fileID: 687367613}
-  _quantityToSpawn: 1
 --- !u!224 &1474802230 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3738172545367369280, guid: 60d7efb8f07e483489ea400378be4366, type: 3}
@@ -4469,6 +4466,53 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 60d7efb8f07e483489ea400378be4366, type: 3}
+--- !u!1 &1639090477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1639090479}
+  - component: {fileID: 1639090478}
+  m_Layer: 0
+  m_Name: SpawnUIController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1639090478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639090477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5265bc622bd3e0942b51a7ce134b85ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spawnTileButton: {fileID: 565215238}
+  _itemSelectionDropdown: {fileID: 687367613}
+  _quantityToSpawn: 1
+--- !u!4 &1639090479
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639090477}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 350, y: 1055, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1682647979
 GameObject:
   m_ObjectHideFlags: 0
@@ -5801,6 +5845,7 @@ SceneRoots:
   - {fileID: 1441589159}
   - {fileID: 1914282540}
   - {fileID: 1439350454}
+  - {fileID: 1639090479}
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 1716333939}
