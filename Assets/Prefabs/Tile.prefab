@@ -387,6 +387,7 @@ GameObject:
   - component: {fileID: 6751380971034870398}
   - component: {fileID: 7718870142961475040}
   - component: {fileID: 8808550465849914033}
+  - component: {fileID: 3777845429774600589}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -467,3 +468,15 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &3777845429774600589
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6540773721903186169}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

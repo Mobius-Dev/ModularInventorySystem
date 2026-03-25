@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Represents a single slot in the inventory system. Each slot can hold one tile, and is responsible for centering the tile within itself when a tile is assigned to it.
 /// </summary>
-public class Slot : MonoBehaviour
+public class Slot : MonoBehaviour, IDropHandler
 {
     private Tile _tileStored;
 
@@ -20,6 +21,16 @@ public class Slot : MonoBehaviour
                 _tileStored.transform.SetParent(this.transform);
                 _tileStored.transform.localPosition = Vector3.zero; // Snap!
             }
+        }
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        // Check if the thing dropped was actually a Tile
+        if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out Tile draggedTile))
+        {
+            // Tell the InventoryManager to attempt placing it exactly here
+            ServiceLocator.Get<InventoryManager>().HandleTileDrop(draggedTile, this);
         }
     }
 }

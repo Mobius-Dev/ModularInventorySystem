@@ -7,17 +7,23 @@ using UnityEngine.UI;
 /// Represents a draggable inventory tile that displays an item stack and supports drag-and-drop operations for
 /// inventory management.
 /// </summary>
+[RequireComponent(typeof(CanvasGroup))]
 public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public ItemStack StackStored { get; private set; }
+
+    public Slot OriginalSlot { get; set; }
 
     [Header("UI References")]
     [SerializeField] private Image _image; // Image element to show the item's icon
     [SerializeField] private TextMeshProUGUI _itemCount; // Text element to show the quantity of items in this tile
     [SerializeField] private TextMeshProUGUI _itemName; // Text element to show the name of the item in this tile (optional)
 
+    private CanvasGroup _canvasGroup;
+
     private void Awake()
     {
+        _canvasGroup = GetComponent<CanvasGroup>();
         if (_itemCount == null) Debug.LogError($"{gameObject.name} is missing Item Count Text!", this);
         if (_image == null) Debug.LogError($"{gameObject.name} is missing Image Component!", this);
         if (_itemName == null) Debug.LogWarning($"{gameObject.name} is missing Item Name Text! This is optional, but can be useful for debugging.", this);
@@ -54,26 +60,27 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Slot lastOccupied = ServiceLocator.Get<InventoryManager>().GetSlotWithTile(this);
+        OriginalSlot = ServiceLocator.Get<InventoryManager>().GetSlotWithTile(this);
 
-        // Check for Split (Shift + Drag)
+        // Splitting logic
         if (InputUtility.IsSplitModifierPressed() &&
             StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
         {
-            // Spawn the visual representation of the split stack
-            // Note: We pass the parent of the current tile to keep hierarchy clean
             Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
-                gameObject,
-                splitStack,
-                transform.parent);
+                gameObject, splitStack, transform.parent);
 
-            ServiceLocator.Get<DragManager>().StartDragging(splitTile, lastOccupied, eventData);
+            // The split tile's "Original" slot is the one we pulled it from
+            splitTile.OriginalSlot = OriginalSlot;
+
+            // Set the event data's pointerDrag to the new split tile, instead of the original that's left in the slot
+            eventData.pointerDrag = splitTile.gameObject;
+
+            ServiceLocator.Get<DragManager>().StartDragging(splitTile, eventData);
         }
         else
         {
-            // Standard Drag
             ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(this);
-            ServiceLocator.Get<DragManager>().StartDragging(this, lastOccupied, eventData);
+            ServiceLocator.Get<DragManager>().StartDragging(this, eventData);
         }
     }
 
@@ -84,7 +91,12 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        ServiceLocator.Get<DragManager>().FinishDragging(eventData);
+        ServiceLocator.Get<DragManager>().FinishDragging(this);
+    }
+
+    public void SetRaycastBlocking(bool blocks)
+    {
+        _canvasGroup.blocksRaycasts = blocks;
     }
 
     private void HandleQuantityChanged(int quantity)

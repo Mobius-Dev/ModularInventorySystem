@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-/// <summary>
-/// Represents a trash bin for managing inventory items in a game environment. It is intended
-/// to handle the disposal of inventory items
-/// </summary>
-public class InventoryTrashBin : MonoBehaviour
+public class InventoryTrashBin : MonoBehaviour, IDropHandler
 {
-
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out Tile draggedTile))
+        {
+            ServiceLocator.Get<InventoryManager>().DestroyTile(draggedTile);
+        }
+    }
 }

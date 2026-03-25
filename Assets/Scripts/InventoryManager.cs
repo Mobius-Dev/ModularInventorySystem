@@ -81,32 +81,46 @@ public class InventoryManager : MonoBehaviour
         NotificationBus.PostMessage($"Spawned a new {tileToPlace.StackStored.ItemStored.ItemDisplayName} into slot {emptySlot.name}");
     }
 
-    public void PlaceTileFromDrag(Tile tileToPlace, Slot fallbackSlot)
+    public void HandleTileDrop(Tile tileToPlace, Slot targetSlot)
     {
-        Slot selectedSlot = GetClosestSlot(tileToPlace);
+        PlacementResult placementResult = TryPlaceTileAt(targetSlot, tileToPlace);
 
-        PlacementResult placementResult = TryPlaceTileAt(selectedSlot, tileToPlace);
+        switch (placementResult)
+        {
+            case PlacementResult.MergedFully:
+                return;
 
-        switch(placementResult)
+            case PlacementResult.MovedToEmpty:
+                targetSlot.TileStored = tileToPlace;
+                //NotificationBus.PostMessage($"Placed {tileToPlace.StackStored.ItemStored.ItemDisplayName} into {targetSlot.name}");
+                break;
+
+            case PlacementResult.MergedPartially:
+                // Partial Success: We merged some, but have leftovers.
+                // The leftovers must go back to the fallback slot.
+                SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
+                return;
+            case PlacementResult.Failed:
+            default:
+                SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
+                break;
+        }
+    }
+
+    public void SnapTileBack(Tile tileToPlace, Slot fallbackSlot)
+    {
+        PlacementResult placementResult = TryPlaceTileAt(fallbackSlot, tileToPlace);
+        switch (placementResult)
         {
             case PlacementResult.MergedFully:
                 // Tile was fully merged, no need to place anything
                 return;
             case PlacementResult.MovedToEmpty:
-                selectedSlot.TileStored = tileToPlace;
-                NotificationBus.PostMessage($"Placed {tileToPlace.StackStored.ItemStored.ItemDisplayName} into an empty slot {selectedSlot.name}");
+                fallbackSlot.TileStored = tileToPlace;
                 break;
-            case PlacementResult.MergedPartially:
-                // Partial Success: We merged some, but have leftovers.
-                // The leftovers must go back to the fallback slot.
-                SnapTileBack(tileToPlace, fallbackSlot);
-                return;
-            case PlacementResult.Failed:
             default:
-                // Failure: We couldn't do anything at the target. 
-                // Send the whole thing back.
-                SnapTileBack(tileToPlace, fallbackSlot);
-                return;
+                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!", this);
+                break;
         }
     }
 
@@ -138,23 +152,6 @@ public class InventoryManager : MonoBehaviour
         targetSlot.TileStored = tileToPlace;
     }
 
-    private void SnapTileBack(Tile tileToPlace, Slot fallbackSlot)
-    {
-        PlacementResult placementResult = TryPlaceTileAt(fallbackSlot, tileToPlace);
-        switch (placementResult)
-        {
-            case PlacementResult.MergedFully:
-                // Tile was fully merged, no need to place anything
-                return;
-            case PlacementResult.MovedToEmpty:
-                fallbackSlot.TileStored = tileToPlace;
-                break;
-            default:
-                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!", this);
-                break;
-        }
-    }
-
     private PlacementResult TryPlaceTileAt(Slot targetSlot, Tile targetTile)
     {
         // Handle Empty Slot (Guard Clause)
@@ -178,27 +175,6 @@ public class InventoryManager : MonoBehaviour
 
         return PlacementResult.MergedPartially;
     }
-    private Slot GetClosestSlot(Tile tile)
-    {
-        Slot closest = null;
-        float minDistanceSqr = float.MaxValue;
-        Vector3 tilePos = tile.transform.position;
-
-        foreach (Slot slot in _allSlots)
-        {
-            // Optimization: Use sqrMagnitude to avoid square roots
-            float distSqr = (slot.transform.position - tilePos).sqrMagnitude;
-
-            if (distSqr < minDistanceSqr)
-            {
-                minDistanceSqr = distSqr;
-                closest = slot;
-            }
-        }
-
-        return closest;
-    }
-
     private void EmptyAllSlots()
     {
         foreach (Slot slot in _allSlots)

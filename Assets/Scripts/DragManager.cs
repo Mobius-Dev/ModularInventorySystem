@@ -1,11 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/// <summary>
-/// Singleton used to handle dragging of UI elements (Tiles) in the inventory system. It manages the drag lifecycle (start, update, finish) an
-/// ensures that dragged items are rendered on top of other UI elements. It also handles dropping items into the trash bin for deletion.
-/// </summary>
 public class DragManager : MonoBehaviour
 {
     [Header("References")]
@@ -13,19 +8,16 @@ public class DragManager : MonoBehaviour
     [SerializeField] private RectTransform _dragLayer;
 
     private Tile _currentTile;
-    private Slot _draggingFrom;
     private Vector2 _offset;
 
-    public void StartDragging(Tile tile, Slot draggingFrom, PointerEventData eventData)
+    public void StartDragging(Tile tile, PointerEventData eventData)
     {
         _currentTile = tile;
-        _draggingFrom = draggingFrom;
 
-        // Move item to the "Drag Layer" so it draws on top of everything
+        // Let the mouse click pass through the tile so the Slots can detect the Drop
+        _currentTile.SetRaycastBlocking(false);
+
         tile.transform.SetParent(_dragLayer);
-
-        // Calculate Offset (The distance between the Mouse and the Item's center)
-        // This ensures the item doesn't "snap" its center to the mouse cursor
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             _dragLayer,
@@ -41,54 +33,26 @@ public class DragManager : MonoBehaviour
     {
         if (_currentTile == null) return;
 
-        // Convert Mouse Screen Position -> World Space UI Position
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _dragLayer,             // The reference frame
-            eventData.position,     // The mouse position
-            eventData.pressEventCamera, // The camera that saw the click
-            out Vector2 localMousePos)) // The result
+            _dragLayer, eventData.position, eventData.pressEventCamera, out Vector2 localMousePos))
         {
-            // Apply the new position + the offset we calculated earlier
             _currentTile.transform.localPosition = localMousePos + _offset;
         }
     }
 
-    public void FinishDragging(PointerEventData eventData)
+    public void FinishDragging(Tile tile)
     {
-        if (_currentTile == null) return;
+        if (tile == null) return;
 
-        var inventoryManager = ServiceLocator.Get<InventoryManager>();
+        // Turn raycasts back on so the tile can be clicked again later
+        tile.SetRaycastBlocking(true);
 
-        if (IsMouseOverTrash(eventData))
+        // If the tile is still on the _dragLayer, it means the user dropped it in empty space
+        if (tile.transform.parent == _dragLayer)
         {
-            // If we release tile above trash bin area, destroy it
-            NotificationBus.PostMessage($"Deleted a stack of {_currentTile.StackStored.ItemStored.ItemDisplayName} with {_currentTile.StackStored.QuantityStored} items");
-            inventoryManager.DestroyTile(_currentTile);
-        }
-        else
-        {
-            inventoryManager.PlaceTileFromDrag(_currentTile, _draggingFrom);
+            ServiceLocator.Get<InventoryManager>().SnapTileBack(tile, tile.OriginalSlot);
         }
 
-        // Get ready to drag another item
         _currentTile = null;
-        _draggingFrom = null;
-    }
-
-    private bool IsMouseOverTrash(PointerEventData eventData)
-    {
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-
-        foreach (RaycastResult result in results)
-        {
-            // Check if we hit the Trash Bin object
-            if (result.gameObject.TryGetComponent(out InventoryTrashBin trashBin))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
