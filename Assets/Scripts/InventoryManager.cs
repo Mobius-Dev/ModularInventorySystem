@@ -1,7 +1,8 @@
+using UnityEngine;
+using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// Singleton used to manage the inventory system as a whole. It keeps track of all the slots in the inventory, handles placing and removing tiles from slots
@@ -125,17 +126,67 @@ public class InventoryManager : MonoBehaviour
         NotificationBus.PostMessage("Emptied all inventory slots");
     }
 
-    public async void LoadInventoryData()
+    public async Task LoadInventoryDataAsync()
     {
         Debug.Log("Loading Inventory...");
-        InventorySaveData data = await _repository.LoadInventoryAsync();
 
-        if (data != null)
+        try
         {
-            ReconstructInventory(data);
-            NotificationBus.PostMessage("Inventory Loaded Successfully");
+            InventorySaveData data = await _repository.LoadInventoryAsync();
+
+            if (data != null)
+            {
+                ReconstructInventory(data);
+                NotificationBus.PostMessage("Inventory Loaded Successfully");
+            }
+            else
+            {
+                NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted.");
+            }
         }
-        else NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted");
+        catch (Exception ex)
+        {
+            Debug.LogError($"[InventoryManager] Critical failure loading inventory: {ex.Message}");
+            NotificationBus.PostMessage("CRITICAL ERROR: Save file is corrupted or unreadable.");
+        }
+    }
+
+    public async Task SaveInventoryDataAsync()
+    {
+        try
+        {
+            InventorySaveData saveData = new InventorySaveData();
+
+            // Iterate through slots, find the ones with tiles, and create ItemStackData for each to be saved
+            for (int i = 0; i < _allSlots.Count; i++)
+            {
+                Slot slot = _allSlots[i];
+
+                if (slot.TileStored != null)
+                {
+                    ItemStack stack = slot.TileStored.StackStored;
+
+                    ItemStackData itemData = new ItemStackData
+                    {
+                        ItemID = stack.ItemStored.ItemID,
+                        SlotIndex = i,
+                        QuantityStored = stack.QuantityStored
+                    };
+
+                    saveData.ItemStacks.Add(itemData);
+                }
+            }
+
+            await _repository.SaveInventoryAsync(saveData);
+
+            Debug.Log("Inventory Saved Successfully!");
+            NotificationBus.PostMessage("Inventory Saved Successfully");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[InventoryManager] Critical failure saving inventory: {ex.Message}");
+            NotificationBus.PostMessage("CRITICAL ERROR: Could not save inventory.");
+        }
     }
 
     private void PlaceTileFromLoad(Tile tileToPlace, int slotIndex)
@@ -197,39 +248,6 @@ public class InventoryManager : MonoBehaviour
 
             PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }
-    }
-
-    public async void SaveInventoryData()
-    {
-        InventorySaveData saveData = new InventorySaveData();
-
-        // Iterate through slots, find the ones with tiles, and create ItemStackData for each to be saved
-        for (int i = 0; i < _allSlots.Count; i++)
-        {
-            // Grab the current slot using the index 'i'
-            Slot slot = _allSlots[i];
-
-            if (slot.TileStored != null)
-            {
-                ItemStack stack = slot.TileStored.StackStored;
-
-                ItemStackData itemData = new ItemStackData
-                {
-                    ItemID = stack.ItemStored.ItemID,
-                    SlotIndex = i,
-                    QuantityStored = stack.QuantityStored
-                };
-
-                // Add it to the list to be saved
-                saveData.ItemStacks.Add(itemData);
-            }
-        }
-
-        // Hand off the data to the file system
-        await _repository.SaveInventoryAsync(saveData);
-
-        Debug.Log("Inventory Saved Successfully!");
-        NotificationBus.PostMessage("Inventory Saved Successfully");
     }
 
     private void CheckInventoryDataExists()

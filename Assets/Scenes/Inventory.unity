@@ -3937,7 +3937,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _clearInventoryButton: {fileID: 216274478}
   _loadDataButton: {fileID: 1714648832}
-  _saveDataButton: {fileID: 565215238}
+  _saveDataButton: {fileID: 1840997525}
 --- !u!4 &1439350454
 Transform:
   m_ObjectHideFlags: 0
