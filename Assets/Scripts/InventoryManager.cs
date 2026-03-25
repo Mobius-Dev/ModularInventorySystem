@@ -8,36 +8,17 @@ using UnityEngine.UI;
 /// </summary>
 public class InventoryManager : MonoBehaviour
 {
-
-    [Header("UI References")]
-    [SerializeField] private Button _clearInventoryButton;
-    [SerializeField] private Button _loadDataButton; // Button for loading inventory from JSON
-    [SerializeField] private Button _saveDataButton; // Button for saving inventory to JSON
-
     [SerializeField] private List<Slot> _allSlots = new();
     private InventoryRepository _repository;
 
     private void Awake()
     {
-        if (_clearInventoryButton)
-        {
-            _clearInventoryButton.onClick.AddListener(() => EmptyAllSlots());
-        }
-        if (_loadDataButton) {
-            _loadDataButton.onClick.AddListener(() => LoadInventoryData());
-        }
-        if (_saveDataButton) {
-            _saveDataButton.onClick.AddListener(() => SaveInventoryData());
-        }
-
         // Dependency Injection (Manual)
         // We create the tools we need.
         IJsonFileReader reader = new LocalJsonFileReader();
         IJsonFileWriter writer = new LocalJsonFileWriter();
         _repository = new InventoryRepository(reader, writer);
 
-        // Check if we have data to load
-        // TODO UI integration: For now, it's here so you can see how loading works without needing to create UI for it.
         CheckInventoryDataExists();
     }
 
@@ -131,6 +112,31 @@ public class InventoryManager : MonoBehaviour
             Destroy(tileToDestroy.gameObject);
         }
     }
+    public void EmptyAllSlots()
+    {
+        foreach (Slot slot in _allSlots)
+        {
+            if (slot.TileStored != null)
+            {
+                Destroy(slot.TileStored.gameObject);
+                slot.TileStored = null;
+            }
+        }
+        NotificationBus.PostMessage("Emptied all inventory slots");
+    }
+
+    public async void LoadInventoryData()
+    {
+        Debug.Log("Loading Inventory...");
+        InventorySaveData data = await _repository.LoadInventoryAsync();
+
+        if (data != null)
+        {
+            ReconstructInventory(data);
+            NotificationBus.PostMessage("Inventory Loaded Successfully");
+        }
+        else NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted");
+    }
 
     private void PlaceTileFromLoad(Tile tileToPlace, int slotIndex)
     {
@@ -175,19 +181,6 @@ public class InventoryManager : MonoBehaviour
 
         return PlacementResult.MergedPartially;
     }
-    private void EmptyAllSlots()
-    {
-        foreach (Slot slot in _allSlots)
-        {
-            if (slot.TileStored != null)
-            {
-                Destroy(slot.TileStored.gameObject);
-                slot.TileStored = null;
-            }
-        }
-        NotificationBus.PostMessage("Emptied all inventory slots");
-    }
-
     private void ReconstructInventory(InventorySaveData data)
     {
         // Clear existing inventory before reconstruction
@@ -204,19 +197,6 @@ public class InventoryManager : MonoBehaviour
 
             PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }
-    }
-
-    private async void LoadInventoryData()
-    {
-        Debug.Log("Loading Inventory...");
-        InventorySaveData data = await _repository.LoadInventoryAsync();
-
-        if (data != null)
-        {
-            ReconstructInventory(data);
-            NotificationBus.PostMessage("Inventory Loaded Successfully");
-        }
-        else NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted");
     }
 
     public async void SaveInventoryData()
