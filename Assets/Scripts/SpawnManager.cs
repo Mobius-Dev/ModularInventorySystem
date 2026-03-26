@@ -22,9 +22,16 @@ public class SpawnManager : MonoBehaviour
         }
 
         GameObject newTileObj = Instantiate(_tilePrefab);
-        Tile newTile = newTileObj.GetComponent<Tile>();
-        ItemStack debugStack = new ItemStack(itemToSpawn, quantityToSpawn);
 
+        Tile newTile = newTileObj.GetComponent<Tile>();
+        // Inject the dependencies
+        newTile.Initialize(
+            ServiceLocator.Get<InventoryManager>(),
+            ServiceLocator.Get<DragManager>(),
+            this // The SpawnManager passes itself
+        );
+
+        ItemStack debugStack = new ItemStack(itemToSpawn, quantityToSpawn);
         newTile.AssignStack(debugStack);
 
         ServiceLocator.Get<InventoryManager>().PlaceTileFromSpawn(newTile);
@@ -33,7 +40,15 @@ public class SpawnManager : MonoBehaviour
     public Tile SpawnTileFromSplitting(GameObject tileObjToClone, ItemStack stackToAssign, Transform parentTransform)
     {
         GameObject newTileObj = Instantiate(tileObjToClone, parentTransform);
+
         Tile newTile = newTileObj.GetComponent<Tile>();
+        // Inject the dependencies
+        newTile.Initialize(
+            ServiceLocator.Get<InventoryManager>(),
+            ServiceLocator.Get<DragManager>(),
+            this // The SpawnManager passes itself
+        );
+
         newTile.AssignStack(stackToAssign);
         return newTile;
     }
@@ -41,7 +56,15 @@ public class SpawnManager : MonoBehaviour
     public Tile SpawnTileFromLoad(ItemStack stackToAssign)
     {
         GameObject newTileObj = Instantiate(_tilePrefab);
+
         Tile newTile = newTileObj.GetComponent<Tile>();
+        // Inject the dependencies
+        newTile.Initialize(
+            ServiceLocator.Get<InventoryManager>(),
+            ServiceLocator.Get<DragManager>(),
+            this // The SpawnManager passes itself
+        );
+
         newTile.AssignStack(stackToAssign);
         return newTile;
     }

@@ -19,6 +19,11 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     [SerializeField] private TextMeshProUGUI _itemCount; // Text element to show the quantity of items in this tile
     [SerializeField] private TextMeshProUGUI _itemName; // Text element to show the name of the item in this tile (optional)
 
+    // Dependency Fields
+    private InventoryManager _inventoryManager;
+    private DragManager _dragManager;
+    private SpawnManager _spawnManager;
+
     private CanvasGroup _canvasGroup;
 
     private void Awake()
@@ -34,6 +39,13 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         {
             StackStored.OnQuantityChanged -= HandleQuantityChanged;
         }
+    }
+
+    public void Initialize(InventoryManager inventoryManager, DragManager dragManager, SpawnManager spawnManager)
+    {
+        _inventoryManager = inventoryManager;
+        _dragManager = dragManager;
+        _spawnManager = spawnManager;
     }
 
     public void AssignStack(ItemStack newStack)
@@ -60,7 +72,7 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        OriginalSlot = ServiceLocator.Get<InventoryManager>().GetSlotWithTile(this);
+        OriginalSlot = _inventoryManager.GetSlotWithTile(this);
 
         // Splitting logic
         if (InputUtility.IsSplitModifierPressed())
@@ -69,12 +81,12 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
             {
                 NotificationBus.PostMessage($"Split stack into {this.StackStored.QuantityStored} and {splitStack.QuantityStored}.");
 
-                Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
+                Tile splitTile = _spawnManager.SpawnTileFromSplitting(
                     gameObject, splitStack, transform.parent);
 
                 splitTile.OriginalSlot = OriginalSlot;
                 eventData.pointerDrag = splitTile.gameObject;
-                ServiceLocator.Get<DragManager>().StartDragging(splitTile, eventData);
+                _dragManager.StartDragging(splitTile, eventData);
             }
             else
             {
@@ -84,19 +96,19 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         else
         {
             // Normal drag logic
-            ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(this);
-            ServiceLocator.Get<DragManager>().StartDragging(this, eventData);
+            _inventoryManager.ReleaseSlotFromTile(this);
+            _dragManager.StartDragging(this, eventData);
         }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        ServiceLocator.Get<DragManager>().UpdatePosition(eventData);
+        _dragManager.UpdatePosition(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        ServiceLocator.Get<DragManager>().FinishDragging(this);
+        _dragManager.FinishDragging(this);
     }
 
     public void SetRaycastBlocking(bool blocks)

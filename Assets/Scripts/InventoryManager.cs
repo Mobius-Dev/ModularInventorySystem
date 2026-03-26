@@ -13,6 +13,15 @@ public class InventoryManager : MonoBehaviour
 
     private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
 
+    private void Start()
+    {
+        // Pass (the InventoryManager itself) to every Slot (dependency injection)
+        foreach (Slot slot in _allSlots)
+        {
+            slot.Initialize(this);
+        }
+    }
+
     public void ReleaseSlotFromTile(Tile tile)
     {
         //Release a slot holding a given tile

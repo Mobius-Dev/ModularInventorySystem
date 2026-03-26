@@ -8,6 +8,8 @@ public class Slot : MonoBehaviour, IDropHandler
 {
     private Tile _tileStored;
 
+    // Dependencies
+    private InventoryManager _inventoryManager;
     public Tile TileStored
     {
         get => _tileStored;
@@ -16,7 +18,7 @@ public class Slot : MonoBehaviour, IDropHandler
             // If this slot already held a tile, and we are changing it, unregister the OLD tile
             if (_tileStored != null && _tileStored != value)
             {
-                ServiceLocator.Get<InventoryManager>().UnregisterTileLocation(_tileStored);
+                _inventoryManager.UnregisterTileLocation(_tileStored);
             }
 
             // Update the backing field
@@ -28,7 +30,7 @@ public class Slot : MonoBehaviour, IDropHandler
                 _tileStored.transform.SetParent(this.transform);
                 _tileStored.transform.localPosition = Vector3.zero; // Snap!
 
-                ServiceLocator.Get<InventoryManager>().RegisterTileLocation(_tileStored, this);
+                _inventoryManager.RegisterTileLocation(_tileStored, this);
             }
         }
     }
@@ -39,7 +41,12 @@ public class Slot : MonoBehaviour, IDropHandler
         if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out Tile draggedTile))
         {
             // Tell the InventoryManager to attempt placing it exactly here
-            ServiceLocator.Get<InventoryManager>().HandleTileDrop(this, draggedTile);
+            _inventoryManager.HandleTileDrop(this, draggedTile);
         }
+    }
+
+    public void Initialize(InventoryManager inventoryManager)
+    {
+        _inventoryManager = inventoryManager;
     }
 }
