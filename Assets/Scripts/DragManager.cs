@@ -10,7 +10,40 @@ public class DragManager : MonoBehaviour
     private Tile _currentTile;
     private Vector2 _offset;
 
-    public void StartDragging(Tile tile, PointerEventData eventData)
+    public void HandleDragStart(Tile sourceTile, PointerEventData eventData)
+    {
+        // Splitting logic
+        if (InputUtility.IsSplitModifierPressed())
+        {
+            if (StackUtility.AttemptSplit(sourceTile.StackStored, out ItemStack splitStack))
+            {
+                NotificationBus.PostMessage($"Split stack into {sourceTile.StackStored.QuantityStored} and {splitStack.QuantityStored}.");
+
+                // Ask SpawnManager to create the new half
+                Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
+                    sourceTile.gameObject, splitStack, sourceTile.transform.parent);
+
+                splitTile.OriginalSlot = sourceTile.OriginalSlot;
+
+                // Tell the Unity Event System that we are now dragging the NEW tile, not the old one
+                eventData.pointerDrag = splitTile.gameObject;
+
+                StartDragging(splitTile, eventData);
+                return;
+            }
+            else
+            {
+                NotificationBus.PostMessage($"Cannot split {sourceTile.StackStored.ItemStored.ItemDisplayName}. Only 1 item left.");
+                // If we can't split, we just fall through and drag the whole tile normally
+            }
+        }
+
+        // Normal drag logic (if no split modifier, or if splitting failed)
+        ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(sourceTile);
+        StartDragging(sourceTile, eventData);
+    }
+
+    private void StartDragging(Tile tile, PointerEventData eventData)
     {
         _currentTile = tile;
 

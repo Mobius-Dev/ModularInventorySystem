@@ -33,8 +33,7 @@ public class SpawnManager : MonoBehaviour
         // Inject the dependencies
         newTile.Initialize(
             ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>(),
-            this // The SpawnManager passes itself
+            ServiceLocator.Get<DragManager>()
         );
 
         ItemStack debugStack = new ItemStack(itemToSpawn, quantityToSpawn);
@@ -51,8 +50,7 @@ public class SpawnManager : MonoBehaviour
         // Inject the dependencies
         newTile.Initialize(
             ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>(),
-            this // The SpawnManager passes itself
+            ServiceLocator.Get<DragManager>()
         );
 
         newTile.AssignStack(stackToAssign);
@@ -67,8 +65,7 @@ public class SpawnManager : MonoBehaviour
         // Inject the dependencies
         newTile.Initialize(
             ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>(),
-            this // The SpawnManager passes itself
+            ServiceLocator.Get<DragManager>()
         );
 
         newTile.AssignStack(stackToAssign);

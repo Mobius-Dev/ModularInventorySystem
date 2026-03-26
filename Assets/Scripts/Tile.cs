@@ -22,7 +22,6 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     // Dependency Fields
     private InventoryManager _inventoryManager;
     private DragManager _dragManager;
-    private SpawnManager _spawnManager;
 
     private CanvasGroup _canvasGroup;
 
@@ -41,11 +40,10 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         }
     }
 
-    public void Initialize(InventoryManager inventoryManager, DragManager dragManager, SpawnManager spawnManager)
+    public void Initialize(InventoryManager inventoryManager, DragManager dragManager)
     {
         _inventoryManager = inventoryManager;
         _dragManager = dragManager;
-        _spawnManager = spawnManager;
     }
 
     public void AssignStack(ItemStack newStack)
@@ -74,31 +72,7 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
     {
         OriginalSlot = _inventoryManager.GetSlotWithTile(this);
 
-        // Splitting logic
-        if (InputUtility.IsSplitModifierPressed())
-        {
-            if (StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
-            {
-                NotificationBus.PostMessage($"Split stack into {this.StackStored.QuantityStored} and {splitStack.QuantityStored}.");
-
-                Tile splitTile = _spawnManager.SpawnTileFromSplitting(
-                    gameObject, splitStack, transform.parent);
-
-                splitTile.OriginalSlot = OriginalSlot;
-                eventData.pointerDrag = splitTile.gameObject;
-                _dragManager.StartDragging(splitTile, eventData);
-            }
-            else
-            {
-                NotificationBus.PostMessage($"Cannot split {this.StackStored.ItemStored.ItemDisplayName}. Only 1 item left.");
-            }
-        }
-        else
-        {
-            // Normal drag logic
-            _inventoryManager.ReleaseSlotFromTile(this);
-            _dragManager.StartDragging(this, eventData);
-        }
+        _dragManager.HandleDragStart(this, eventData);
     }
 
     public void OnDrag(PointerEventData eventData)
