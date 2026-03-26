@@ -2,15 +2,15 @@ using UnityEngine;
 using System;
 using System.Threading.Tasks;
 
-public class SaveLoadManager : MonoBehaviour
+public class SaveLoadManager
 {
     private InventoryRepository _repository;
 
-    private void Awake()
+    public SaveLoadManager()
     {
-        // Manual dependency injection for the repository
         IJsonFileReader reader = new LocalJsonFileReader();
         IJsonFileWriter writer = new LocalJsonFileWriter();
+
         _repository = new InventoryRepository(reader, writer);
 
         if (_repository.FileExists())

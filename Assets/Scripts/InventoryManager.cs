@@ -5,19 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Singleton used to manage the inventory system as a whole. It keeps track of all the slots in the inventory, handles placing and removing tiles from slots
+/// Class ussed to manage the inventory system as a whole. It keeps track of all the slots in the inventory, and provied methods for placing, merging and removing tiles, and regenerating from save data.
+/// It also maintains a dictionary mapping Tiles to their current Slot for O(1) lookup of tile locations.
 /// </summary>
-public class InventoryManager : MonoBehaviour
+public class InventoryManager
 {
-    [SerializeField] private List<Slot> _allSlots = new();
-
+    private List<Slot> _allSlots = new();
     private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
 
-    private void Start()
+    public InventoryManager(List<Slot> slots)
     {
-        // Pass (the InventoryManager itself) to every Slot (dependency injection)
+        _allSlots = slots;
+
         foreach (Slot slot in _allSlots)
         {
+            // Pass a reference to self to each slot
             slot.Initialize(this);
         }
     }
@@ -34,7 +36,7 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Could not find a slot containing {tile.name}", this);
+            Debug.LogError($"Could not find a slot containing {tile.name}");
         }
     }
 
@@ -67,9 +69,9 @@ public class InventoryManager : MonoBehaviour
 
         if (!targetSlot)
         {
-            Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!", this);
+            Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!");
             NotificationBus.PostMessage($"No empty slots available for {tileToPlace.StackStored.ItemStored.ItemDisplayName}!");
-            Destroy(tileToPlace.gameObject);
+            UnityEngine.Object.Destroy(tileToPlace.gameObject);
             return;
         }
 
@@ -118,7 +120,7 @@ public class InventoryManager : MonoBehaviour
                 fallbackSlot.TileStored = tileToPlace;
                 break;
             default:
-                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!", this);
+                Debug.LogError($"Could not fully return tile {tileToPlace.name} to its fallback slot {fallbackSlot.name}. This should never happen!");
                 break;
         }
     }
@@ -127,7 +129,7 @@ public class InventoryManager : MonoBehaviour
     {
         if (tileToDestroy)
         {
-            Destroy(tileToDestroy.gameObject);
+            UnityEngine.Object.Destroy(tileToDestroy.gameObject);
         }
     }
     public void EmptyAllSlots()
@@ -136,7 +138,7 @@ public class InventoryManager : MonoBehaviour
         {
             if (slot.TileStored != null)
             {
-                Destroy(slot.TileStored.gameObject);
+                UnityEngine.Object.Destroy(slot.TileStored.gameObject);
                 slot.TileStored = null;
             }
         }
@@ -192,16 +194,16 @@ public class InventoryManager : MonoBehaviour
     {
         if (slotIndex < 0 || slotIndex >= _allSlots.Count)
         {
-            Debug.LogError($"Invalid slot index {slotIndex} for placing loaded tile {tileToPlace.name}. This should never happen if the save/load system is working correctly.", this);
-            Destroy(tileToPlace.gameObject);
+            Debug.LogError($"Invalid slot index {slotIndex} for placing loaded tile {tileToPlace.name}. This should never happen if the save/load system is working correctly.");
+            UnityEngine.Object.Destroy(tileToPlace.gameObject);
             return;
         }
 
         Slot targetSlot = _allSlots[slotIndex];
         if (targetSlot.TileStored != null)
         {
-            Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied by {targetSlot.TileStored.name}. This should never happen if the save/load system is working correctly. Destroying the tile to prevent issues.", this);
-            Destroy(tileToPlace.gameObject);
+            Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied by {targetSlot.TileStored.name}. This should never happen if the save/load system is working correctly. Destroying the tile to prevent issues.");
+            UnityEngine.Object.Destroy(tileToPlace.gameObject);
             return;
         }
 
@@ -225,24 +227,10 @@ public class InventoryManager : MonoBehaviour
         // Handle Cleanup
         if (targetTile.StackStored.QuantityStored == 0)
         {
-            Destroy(targetTile.gameObject);
+            UnityEngine.Object.Destroy(targetTile.gameObject);
             return PlacementResult.MergedFully;
         }
 
         return PlacementResult.MergedPartially;
     }
-
-#if UNITY_EDITOR
-    [ContextMenu("Find And Register All Slots")]
-    private void SetupSlotsFromEditor()
-    {
-        var foundSlots = FindObjectsByType<Slot>(FindObjectsSortMode.None);
-
-        _allSlots = foundSlots.OrderBy(s => s.transform.GetSiblingIndex()).Reverse().ToList();
-
-        UnityEditor.EditorUtility.SetDirty(this);
-
-        Debug.Log($"Successfully found and registered {_allSlots.Count} Slots!", this);
-    }
-#endif
 }
