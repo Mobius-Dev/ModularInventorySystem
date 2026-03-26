@@ -63,22 +63,27 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         OriginalSlot = ServiceLocator.Get<InventoryManager>().GetSlotWithTile(this);
 
         // Splitting logic
-        if (InputUtility.IsSplitModifierPressed() &&
-            StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
+        if (InputUtility.IsSplitModifierPressed())
         {
-            Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
-                gameObject, splitStack, transform.parent);
+            if (StackUtility.AttemptSplit(this.StackStored, out ItemStack splitStack))
+            {
+                NotificationBus.PostMessage($"Split stack into {this.StackStored.QuantityStored} and {splitStack.QuantityStored}.");
 
-            // The split tile's "Original" slot is the one we pulled it from
-            splitTile.OriginalSlot = OriginalSlot;
+                Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
+                    gameObject, splitStack, transform.parent);
 
-            // Set the event data's pointerDrag to the new split tile, instead of the original that's left in the slot
-            eventData.pointerDrag = splitTile.gameObject;
-
-            ServiceLocator.Get<DragManager>().StartDragging(splitTile, eventData);
+                splitTile.OriginalSlot = OriginalSlot;
+                eventData.pointerDrag = splitTile.gameObject;
+                ServiceLocator.Get<DragManager>().StartDragging(splitTile, eventData);
+            }
+            else
+            {
+                NotificationBus.PostMessage($"Cannot split {this.StackStored.ItemStored.ItemDisplayName}. Only 1 item left.");
+            }
         }
         else
         {
+            // Normal drag logic
             ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(this);
             ServiceLocator.Get<DragManager>().StartDragging(this, eventData);
         }

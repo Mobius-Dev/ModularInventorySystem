@@ -8,59 +8,45 @@ public static class StackUtility
 {
     public static bool AttemptMerge(ItemStack stackA, ItemStack stackB)
     {
-        // Attempt to merge stackB into stackA
-
+        // stackB is the source stack we want to merge into stackA (the target stack)
         if (stackA.ItemStored.ItemID == stackB.ItemStored.ItemID)
         {
             int totalQuantity = stackA.QuantityStored + stackB.QuantityStored;
 
-            // If the total quantity fits within the max stack size, merge completely
             if (totalQuantity <= stackA.ItemStored.MaxStackSize)
             {
                 stackA.QuantityStored = totalQuantity;
-                stackB.QuantityStored = 0; // Emptied stackB
-                NotificationBus.PostMessage($"Fully merged stacks: {stackA.ItemStored.ItemDisplayName} now has {stackA.QuantityStored} items.");
-                return true;
+                stackB.QuantityStored = 0;
+                return true; // Fully merged
             }
-            // Otherwise, fill stackA to max and reduce stackB accordingly
             else
             {
                 int spaceLeft = stackA.ItemStored.MaxStackSize - stackA.QuantityStored;
-                stackA.QuantityStored += spaceLeft;
-                stackB.QuantityStored -= spaceLeft;
 
                 if (spaceLeft == 0)
                 {
-                    NotificationBus.PostMessage($"Can't merge, {stackA.ItemStored.ItemDisplayName} is already at max stack size of {stackA.ItemStored.MaxStackSize}");
-                    
+                    return false; // Target is already full. Merge failed.
                 }
-                else
-                {
-                    NotificationBus.PostMessage($"Partially merged stacks: {stackA.ItemStored.ItemDisplayName} now has {stackA.QuantityStored} items, {stackB.QuantityStored} items remain in stackB.");
-                }
-                return true;
+
+                stackA.QuantityStored += spaceLeft;
+                stackB.QuantityStored -= spaceLeft;
+                return true; // Partially merged
             }
         }
-        // Requirements for merging not met
-        NotificationBus.PostMessage($"Can't merge two different items: {stackA.ItemStored.ItemDisplayName}, {stackB.ItemStored.ItemDisplayName}");
-        return false;
+        return false; // Different items. Merge failed.
     }
-
     public static bool AttemptSplit(ItemStack originalStack, out ItemStack newStack)
     {
-        // Attempt to split the original stack into two stacks of equal quantity
-
         if (originalStack.QuantityStored > 1)
         {
             int splitQuantity = originalStack.QuantityStored / 2;
             originalStack.QuantityStored -= splitQuantity;
             newStack = new ItemStack(originalStack.ItemStored, splitQuantity);
-            NotificationBus.PostMessage($"Split stack of {originalStack.ItemStored.ItemDisplayName} into two stacks of {originalStack.QuantityStored} and {newStack.QuantityStored} items");
             return true;
         }
 
         newStack = null;
-        NotificationBus.PostMessage($"Can't split stack of {originalStack.ItemStored.ItemDisplayName} because it only has a single item");
-        return false; // Not enough quantity to split
+        return false;
     }
 }
+

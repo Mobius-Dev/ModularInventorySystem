@@ -66,24 +66,27 @@ public class InventoryManager : MonoBehaviour
     public void HandleTileDrop(Tile tileToPlace, Slot targetSlot)
     {
         PlacementResult placementResult = TryPlaceTileAt(targetSlot, tileToPlace);
+        string itemName = tileToPlace.StackStored.ItemStored.ItemDisplayName;
 
         switch (placementResult)
         {
             case PlacementResult.MergedFully:
+                NotificationBus.PostMessage($"Fully merged {itemName} into {targetSlot.name}.");
                 return;
 
             case PlacementResult.MovedToEmpty:
                 targetSlot.TileStored = tileToPlace;
-                //NotificationBus.PostMessage($"Placed {tileToPlace.StackStored.ItemStored.ItemDisplayName} into {targetSlot.name}");
+                NotificationBus.PostMessage($"Placed {itemName} into {targetSlot.name}.");
                 break;
 
             case PlacementResult.MergedPartially:
-                // Partial Success: We merged some, but have leftovers.
-                // The leftovers must go back to the fallback slot.
+                NotificationBus.PostMessage($"Partially merged {itemName}. Leftovers returned.");
                 SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
                 return;
+
             case PlacementResult.Failed:
             default:
+                NotificationBus.PostMessage($"Could not place {itemName} in {targetSlot.name}.");
                 SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
                 break;
         }
