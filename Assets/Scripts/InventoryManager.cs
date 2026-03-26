@@ -10,7 +10,9 @@ using System.Linq;
 public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private List<Slot> _allSlots = new();
+
     private InventoryRepository _repository;
+    private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
 
     private void Awake()
     {
@@ -41,17 +43,32 @@ public class InventoryManager : MonoBehaviour
 
     public Slot GetSlotWithTile(Tile tile)
     {
-        // Returns a slot holding a given tile
-        Slot foundSlot = _allSlots.FirstOrDefault(slot => slot.TileStored == tile);
-        return foundSlot;
+        // O(1) instantaneous lookup
+        if (_tileToSlotMap.TryGetValue(tile, out Slot foundSlot))
+        {
+            return foundSlot;
+        }
+        return null;
+    }
+
+    public void RegisterTileLocation(Tile tile, Slot slot)
+    {
+        if (tile == null) return;
+        _tileToSlotMap[tile] = slot;
+    }
+
+    public void UnregisterTileLocation(Tile tile)
+    {
+        if (tile == null) return;
+        _tileToSlotMap.Remove(tile);
     }
 
     public void PlaceTileFromSpawn(Tile tileToPlace)
     {
-        // Last instead of first so items start appearing in the scene starting from top-left corner, not bottom-right
-        Slot emptySlot = _allSlots.LastOrDefault(slot => slot.TileStored == null);
+        // Find empty slot; Last instead of First so items start appearing in the scene starting from top-left corner, not bottom-right
+        Slot targetSlot = _allSlots.LastOrDefault(slot => slot.TileStored == null);
 
-        if (!emptySlot)
+        if (!targetSlot)
         {
             Debug.LogWarning($"Tried to place spawned tile {tileToPlace.name} into an empty slot but found none!", this);
             NotificationBus.PostMessage($"No empty slots available for {tileToPlace.StackStored.ItemStored.ItemDisplayName}!");
@@ -59,11 +76,11 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        emptySlot.TileStored = tileToPlace;
-        NotificationBus.PostMessage($"Spawned a new {tileToPlace.StackStored.ItemStored.ItemDisplayName} into slot {emptySlot.name}");
+        targetSlot.TileStored = tileToPlace;
+        NotificationBus.PostMessage($"Spawned a new {tileToPlace.StackStored.ItemStored.ItemDisplayName} into slot {targetSlot.name}");
     }
 
-    public void HandleTileDrop(Tile tileToPlace, Slot targetSlot)
+    public void HandleTileDrop(Slot targetSlot, Tile tileToPlace)
     {
         PlacementResult placementResult = TryPlaceTileAt(targetSlot, tileToPlace);
         string itemName = tileToPlace.StackStored.ItemStored.ItemDisplayName;

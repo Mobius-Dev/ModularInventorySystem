@@ -13,11 +13,8 @@ public class ItemDatabase : ScriptableObject
 
     // Optimization: A Dictionary is faster than a List for lookups
     private Dictionary<string, ItemDef> _lookup;
-    public List<ItemDef> AllItems
-    {
-        get { return _allItems; }
-        private set { _allItems = value; }
-    }
+    // We make sure item database can't be changed at runtime
+    public IReadOnlyList<ItemDef> AllItems => _allItems;
 
     public void Init()
     {
