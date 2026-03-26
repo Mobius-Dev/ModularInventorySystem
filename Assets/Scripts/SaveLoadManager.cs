@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class SaveLoadManager
 {
@@ -48,7 +50,7 @@ public class SaveLoadManager
         try
         {
             // Ask the InventoryManager for the current state of the inventory
-            InventorySaveData saveData = ServiceLocator.Get<InventoryManager>().GenerateSaveData();
+            InventorySaveData saveData = GenerateSaveData();
 
             await _repository.SaveInventoryAsync(saveData);
 
@@ -60,5 +62,33 @@ public class SaveLoadManager
             Debug.LogError($"[SaveLoadManager] Critical failure saving inventory: {ex.Message}");
             NotificationBus.PostMessage("CRITICAL ERROR: Could not save inventory.");
         }
+    }
+
+    private InventorySaveData GenerateSaveData()
+    {
+        InventorySaveData saveData = new InventorySaveData();
+        IReadOnlyList<Slot> allSlots = ServiceLocator.Get<InventoryManager>().AllSlots;
+
+        // Iterate through slots, find the ones with tiles, and create ItemStackData
+        for (int i = 0; i < allSlots.Count; i++)
+        {
+            Slot slot = allSlots[i];
+
+            if (slot.TileStored != null)
+            {
+                ItemStack stack = slot.TileStored.StackStored;
+
+                ItemStackData itemData = new ItemStackData
+                {
+                    ItemID = stack.ItemStored.ItemID,
+                    SlotIndex = i,
+                    QuantityStored = stack.QuantityStored
+                };
+
+                saveData.ItemStacks.Add(itemData);
+            }
+        }
+
+        return saveData;
     }
 }

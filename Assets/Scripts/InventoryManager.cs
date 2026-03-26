@@ -10,6 +10,8 @@ using System.Linq;
 /// </summary>
 public class InventoryManager
 {
+    public IReadOnlyList<Slot> AllSlots => _allSlots;
+
     private List<Slot> _allSlots = new();
     private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
 
@@ -148,32 +150,6 @@ public class InventoryManager
     public bool HasEmptySlot()
     {
         return _allSlots.Any(slot => slot.TileStored == null);
-    }
-    public InventorySaveData GenerateSaveData()
-    {
-        InventorySaveData saveData = new InventorySaveData();
-
-        // Iterate through slots, find the ones with tiles, and create ItemStackData
-        for (int i = 0; i < _allSlots.Count; i++)
-        {
-            Slot slot = _allSlots[i];
-
-            if (slot.TileStored != null)
-            {
-                ItemStack stack = slot.TileStored.StackStored;
-
-                ItemStackData itemData = new ItemStackData
-                {
-                    ItemID = stack.ItemStored.ItemID,
-                    SlotIndex = i,
-                    QuantityStored = stack.QuantityStored
-                };
-
-                saveData.ItemStacks.Add(itemData);
-            }
-        }
-
-        return saveData;
     }
 
     public void ReconstructInventory(InventorySaveData data)
