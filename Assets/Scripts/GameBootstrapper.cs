@@ -13,6 +13,7 @@ public class GameBootstrapper : MonoBehaviour
     [SerializeField] private InventoryManager _inventoryManager;
     [SerializeField] private SpawnManager _spawnManager;
     [SerializeField] private DragManager _dragManager;
+    [SerializeField] private SaveLoadManager _saveLoadManager;
 
     private void Awake()
     {
@@ -23,6 +24,7 @@ public class GameBootstrapper : MonoBehaviour
         ServiceLocator.Register<InventoryManager>(_inventoryManager);
         ServiceLocator.Register<SpawnManager>(_spawnManager);
         ServiceLocator.Register<DragManager>(_dragManager);
+        ServiceLocator.Register<SaveLoadManager>(_saveLoadManager);
     }
 
     private void OnDestroy()
@@ -31,5 +33,6 @@ public class GameBootstrapper : MonoBehaviour
         ServiceLocator.Unregister<InventoryManager>();
         ServiceLocator.Unregister<SpawnManager>();
         ServiceLocator.Unregister<DragManager>();
+        ServiceLocator.Unregister<SaveLoadManager>();
     }
 }

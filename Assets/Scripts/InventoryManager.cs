@@ -11,19 +11,7 @@ public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private List<Slot> _allSlots = new();
 
-    private InventoryRepository _repository;
     private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
-
-    private void Awake()
-    {
-        // Dependency Injection (Manual)
-        // We create the tools we need.
-        IJsonFileReader reader = new LocalJsonFileReader();
-        IJsonFileWriter writer = new LocalJsonFileWriter();
-        _repository = new InventoryRepository(reader, writer);
-
-        CheckInventoryDataExists();
-    }
 
     public void ReleaseSlotFromTile(Tile tile)
     {
@@ -146,66 +134,48 @@ public class InventoryManager : MonoBehaviour
         NotificationBus.PostMessage("Emptied all inventory slots");
     }
 
-    public async Task LoadInventoryDataAsync()
+    public InventorySaveData GenerateSaveData()
     {
-        Debug.Log("Loading Inventory...");
+        InventorySaveData saveData = new InventorySaveData();
 
-        try
+        // Iterate through slots, find the ones with tiles, and create ItemStackData
+        for (int i = 0; i < _allSlots.Count; i++)
         {
-            InventorySaveData data = await _repository.LoadInventoryAsync();
+            Slot slot = _allSlots[i];
 
-            if (data != null)
+            if (slot.TileStored != null)
             {
-                ReconstructInventory(data);
-                NotificationBus.PostMessage("Inventory Loaded Successfully");
-            }
-            else
-            {
-                NotificationBus.PostMessage("Failed to load inventory data. No file found or file was corrupted.");
+                ItemStack stack = slot.TileStored.StackStored;
+
+                ItemStackData itemData = new ItemStackData
+                {
+                    ItemID = stack.ItemStored.ItemID,
+                    SlotIndex = i,
+                    QuantityStored = stack.QuantityStored
+                };
+
+                saveData.ItemStacks.Add(itemData);
             }
         }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[InventoryManager] Critical failure loading inventory: {ex.Message}");
-            NotificationBus.PostMessage("CRITICAL ERROR: Save file is corrupted or unreadable.");
-        }
+
+        return saveData;
     }
 
-    public async Task SaveInventoryDataAsync()
+    public void ReconstructInventory(InventorySaveData data)
     {
-        try
+        // Clear existing inventory before reconstruction
+        EmptyAllSlots();
+
+        // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
+        foreach (var itemData in data.ItemStacks)
         {
-            InventorySaveData saveData = new InventorySaveData();
+            ItemDef realItemDef = ServiceLocator.Get<ItemDatabase>().GetItemByID(itemData.ItemID);
 
-            // Iterate through slots, find the ones with tiles, and create ItemStackData for each to be saved
-            for (int i = 0; i < _allSlots.Count; i++)
-            {
-                Slot slot = _allSlots[i];
+            ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
 
-                if (slot.TileStored != null)
-                {
-                    ItemStack stack = slot.TileStored.StackStored;
+            Tile reconstructedTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromLoad(newStack);
 
-                    ItemStackData itemData = new ItemStackData
-                    {
-                        ItemID = stack.ItemStored.ItemID,
-                        SlotIndex = i,
-                        QuantityStored = stack.QuantityStored
-                    };
-
-                    saveData.ItemStacks.Add(itemData);
-                }
-            }
-
-            await _repository.SaveInventoryAsync(saveData);
-
-            Debug.Log("Inventory Saved Successfully!");
-            NotificationBus.PostMessage("Inventory Saved Successfully");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[InventoryManager] Critical failure saving inventory: {ex.Message}");
-            NotificationBus.PostMessage("CRITICAL ERROR: Could not save inventory.");
+            PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }
     }
 
@@ -251,35 +221,6 @@ public class InventoryManager : MonoBehaviour
         }
 
         return PlacementResult.MergedPartially;
-    }
-    private void ReconstructInventory(InventorySaveData data)
-    {
-        // Clear existing inventory before reconstruction
-        EmptyAllSlots();
-
-        // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
-        foreach (var itemData in data.ItemStacks)
-        {
-            ItemDef realItemDef = ServiceLocator.Get<ItemDatabase>().GetItemByID(itemData.ItemID);
-
-            ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
-
-            Tile reconstructedTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromLoad(newStack);
-
-            PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
-        }
-    }
-
-    private void CheckInventoryDataExists()
-    {
-        if (_repository.FileExists())
-        {
-            Debug.Log("Inventory data file found. Ready to load inventory.");
-        }
-        else
-        {
-            Debug.LogWarning("No inventory data file found.");
-        }
     }
 
 #if UNITY_EDITOR
