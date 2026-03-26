@@ -145,6 +145,10 @@ public class InventoryManager
         NotificationBus.PostMessage("Emptied all inventory slots");
     }
 
+    public bool HasEmptySlot()
+    {
+        return _allSlots.Any(slot => slot.TileStored == null);
+    }
     public InventorySaveData GenerateSaveData()
     {
         InventorySaveData saveData = new InventorySaveData();

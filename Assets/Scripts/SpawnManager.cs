@@ -21,6 +21,12 @@ public class SpawnManager : MonoBehaviour
             Debug.LogWarning($"Requested quantity exceeds max stack size. Spawning {quantityToSpawn} instead.");
         }
 
+        if (!ServiceLocator.Get<InventoryManager>().HasEmptySlot())
+        {
+            Debug.LogWarning("No empty slots available to spawn the item.");
+            return;
+        }
+
         GameObject newTileObj = Instantiate(_tilePrefab);
 
         Tile newTile = newTileObj.GetComponent<Tile>();
