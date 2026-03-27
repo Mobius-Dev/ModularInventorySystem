@@ -15,4 +15,4 @@ MonoBehaviour:
   ItemDisplayName: Metal
   ItemID: Crafting_Metal
   Sprite: {fileID: -3407685708110407838, guid: c849c0489b3073e4ba75198ae7d01594, type: 3}
-  MaxStackSize: 16
+  MaxStackSize: 8

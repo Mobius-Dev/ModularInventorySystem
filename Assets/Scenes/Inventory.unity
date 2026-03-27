@@ -997,6 +997,7 @@ MonoBehaviour:
   _itemDatabase: {fileID: 11400000, guid: 2320367aa3c0eb040abaaf6c27e88c2d, type: 2}
   _spawnManager: {fileID: 1441589160}
   _dragManager: {fileID: 1914282541}
+  _inputManager: {fileID: 1224683753}
   _sceneSlots:
   - {fileID: 1273084537}
   - {fileID: 541660852}
@@ -2552,6 +2553,7 @@ Transform:
   m_Children:
   - {fileID: 1914282540}
   - {fileID: 1441589159}
+  - {fileID: 1224683752}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &867108969
@@ -3451,6 +3453,67 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3738172545367369280, guid: 60d7efb8f07e483489ea400378be4366, type: 3}
   m_PrefabInstance: {fileID: 1194696415}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1224683751
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1224683752}
+  - component: {fileID: 1224683753}
+  m_Layer: 0
+  m_Name: InputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1224683752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224683751}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 833308502}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1224683753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224683751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4d3b15d8220c04d9efa6098c882191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _splitModifierAction:
+    m_Name: Split Modifier
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 42d6c6f6-4a7e-41fc-8132-b33c834eba22
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: ef5ac559-5664-4c1a-887d-1ad4b47dc8f9
+      m_Path: <Keyboard>/leftShift
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Split Modifier
+      m_Flags: 0
+    m_Flags: 0
 --- !u!114 &1260216712 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8285584408890557044, guid: 60d7efb8f07e483489ea400378be4366, type: 3}

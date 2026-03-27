@@ -13,7 +13,7 @@ public class DragManager : MonoBehaviour
     public void HandleDragStart(Tile sourceTile, PointerEventData eventData)
     {
         // Splitting logic
-        if (InputUtility.IsSplitModifierPressed())
+        if (ServiceLocator.Get<InputManager>().IsSplitModifierPressed())
         {
             if (StackUtility.AttemptSplit(sourceTile.StackStored, out ItemStack splitStack))
             {

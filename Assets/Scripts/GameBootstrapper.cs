@@ -14,6 +14,7 @@ public class GameBootstrapper : MonoBehaviour
     [Header("Game Managers")]
     [SerializeField] private SpawnManager _spawnManager;
     [SerializeField] private DragManager _dragManager;
+    [SerializeField] private InputManager _inputManager;
 
     private SaveLoadManager _saveLoadManager;
     private InventoryManager _inventoryManager;
@@ -32,6 +33,7 @@ public class GameBootstrapper : MonoBehaviour
         ServiceLocator.Register<InventoryManager>(_inventoryManager);
         ServiceLocator.Register<SpawnManager>(_spawnManager);
         ServiceLocator.Register<DragManager>(_dragManager);
+        ServiceLocator.Register<InputManager>(_inputManager);
         ServiceLocator.Register<SaveLoadManager>(_saveLoadManager);
     }
 
@@ -41,6 +43,7 @@ public class GameBootstrapper : MonoBehaviour
         ServiceLocator.Unregister<InventoryManager>();
         ServiceLocator.Unregister<SpawnManager>();
         ServiceLocator.Unregister<DragManager>();
+        ServiceLocator.Unregister<InputManager>();
         ServiceLocator.Unregister<SaveLoadManager>();
     }
 
