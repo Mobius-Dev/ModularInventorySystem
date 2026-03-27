@@ -16,7 +16,7 @@ public class ItemDatabase : ScriptableObject
     // We make sure item database can't be changed at runtime
     public IReadOnlyList<ItemDef> AllItems => _allItems;
 
-    public void Init()
+    public void Initialize()
     {
         // Convert the List to a Dictionary for instant access
         _lookup = new Dictionary<string, ItemDef>();
@@ -39,7 +39,7 @@ public class ItemDatabase : ScriptableObject
     public ItemDef GetItemByID(string id)
     {
         // Ensure dictionary is ready
-        if (_lookup == null) Init();
+        if (_lookup == null) Initialize();
 
         if (_lookup.TryGetValue(id, out ItemDef item))
         {

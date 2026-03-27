@@ -10,6 +10,16 @@ public class DragManager : MonoBehaviour
     private Tile _currentTile;
     private Vector2 _offset;
 
+    // Dependencies
+    private InputManager _inputManager;
+    private SpawnManager _spawnManager;
+    private InventoryManager _inventoryManager;
+    public void Initialize(InputManager inputManager, SpawnManager spawnManager, InventoryManager inventoryManager)
+    {
+        _inputManager = inputManager;
+        _spawnManager = spawnManager;
+        _inventoryManager = inventoryManager;
+    }
     public void HandleDragStart(Tile sourceTile, PointerEventData eventData)
     {
         // Splitting logic

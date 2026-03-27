@@ -10,6 +10,10 @@ public class SpawnManager : MonoBehaviour
 
     private ObjectPool<Tile> _tilePool;
 
+    // Dependencies
+    private InventoryManager _inventoryManager;
+    private DragManager _dragManager;
+
     private void Awake()
     {
         // Initialize the pool
@@ -22,6 +26,12 @@ public class SpawnManager : MonoBehaviour
             defaultCapacity: _defaultCapacity,
             maxSize: _maxSize
         );
+    }
+
+    public void Initialize(InventoryManager inventoryManager, DragManager dragManager)
+    {
+        _inventoryManager = inventoryManager;
+        _dragManager = dragManager;
     }
 
     // --- POOL CALLBACKS ---

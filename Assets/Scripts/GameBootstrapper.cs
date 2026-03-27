@@ -24,27 +24,11 @@ public class GameBootstrapper : MonoBehaviour
 
     private void Awake()
     {
-        _itemDatabase.Init();
-
-        _inventoryManager = new InventoryManager(_sceneSlots);
-        _saveLoadManager = new SaveLoadManager();
-
-        ServiceLocator.Register<ItemDatabase>(_itemDatabase);
-        ServiceLocator.Register<InventoryManager>(_inventoryManager);
-        ServiceLocator.Register<SpawnManager>(_spawnManager);
-        ServiceLocator.Register<DragManager>(_dragManager);
-        ServiceLocator.Register<InputManager>(_inputManager);
-        ServiceLocator.Register<SaveLoadManager>(_saveLoadManager);
-    }
-
-    private void OnDestroy()
-    {
-        ServiceLocator.Unregister<ItemDatabase>();
-        ServiceLocator.Unregister<InventoryManager>();
-        ServiceLocator.Unregister<SpawnManager>();
-        ServiceLocator.Unregister<DragManager>();
-        ServiceLocator.Unregister<InputManager>();
-        ServiceLocator.Unregister<SaveLoadManager>();
+        _itemDatabase.Initialize();
+        _inventoryManager = new InventoryManager(_sceneSlots, _spawnManager, _itemDatabase);
+        _saveLoadManager = new SaveLoadManager(_inventoryManager);
+        _spawnManager.Initialize(_inventoryManager, _dragManager);
+        _dragManager.Initialize(_inputManager, _spawnManager, _inventoryManager);
     }
 
 #if UNITY_EDITOR

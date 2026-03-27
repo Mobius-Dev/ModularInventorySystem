@@ -15,13 +15,18 @@ public class InventoryManager
     private List<Slot> _allSlots = new();
     private Dictionary<Tile, Slot> _tileToSlotMap = new Dictionary<Tile, Slot>();
 
-    public InventoryManager(List<Slot> slots)
+    // Dependencies
+    private readonly SpawnManager _spawnManager;
+    private readonly ItemDatabase _itemDatabase;
+
+    public InventoryManager(List<Slot> slots, SpawnManager spawnManager, ItemDatabase itemDatabase)
     {
         _allSlots = slots;
+        _spawnManager = spawnManager;
+        _itemDatabase = itemDatabase;
 
         foreach (Slot slot in _allSlots)
         {
-            // Pass a reference to self to each slot
             slot.Initialize(this);
         }
     }
@@ -90,7 +95,7 @@ public class InventoryManager
         switch (placementResult)
         {
             case PlacementResult.MergedFully:
-                ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
+                _spawnManager.ReturnTileToPool(tileToPlace);
                 NotificationBus.PostMessage($"Fully merged {itemName} into {targetSlot.name}.");
                 return;
 
@@ -141,7 +146,7 @@ public class InventoryManager
     {
         if (tileToDestroy)
         {
-            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToDestroy);
+            _spawnManager.ReturnTileToPool(tileToDestroy);
         }
     }
 
@@ -172,11 +177,11 @@ public class InventoryManager
         // We iterate through the saved item stacks, reconstruct the corresponding ItemStack and Tile for each, and place them in the inventory.
         foreach (var itemData in data.ItemStacks)
         {
-            ItemDef realItemDef = ServiceLocator.Get<ItemDatabase>().GetItemByID(itemData.ItemID);
+            ItemDef realItemDef = _itemDatabase.GetItemByID(itemData.ItemID);
 
             ItemStack newStack = new ItemStack(realItemDef, itemData.QuantityStored);
 
-            Tile reconstructedTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromLoad(newStack);
+            Tile reconstructedTile = _spawnManager.SpawnTileFromLoad(newStack);
 
             PlaceTileFromLoad(reconstructedTile, itemData.SlotIndex);
         }
@@ -187,7 +192,7 @@ public class InventoryManager
         if (slotIndex < 0 || slotIndex >= _allSlots.Count)
         {
             Debug.LogError($"Invalid slot index {slotIndex}...");
-            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
+            _spawnManager.ReturnTileToPool(tileToPlace);
             return;
         }
 
@@ -196,7 +201,7 @@ public class InventoryManager
         {
             Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied...");
             // Object.Destroy(tileToPlace.gameObject);
-            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
+            _spawnManager.ReturnTileToPool(tileToPlace);
             return;
         }
 

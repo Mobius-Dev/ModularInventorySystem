@@ -7,12 +7,13 @@ using System.Collections.Generic;
 public class SaveLoadManager
 {
     private InventoryRepository _repository;
-
-    public SaveLoadManager()
+    private InventoryManager _inventoryManager;
+    public SaveLoadManager(InventoryManager inventoryManager)
     {
+        _inventoryManager = inventoryManager;
+
         IJsonFileReader reader = new LocalJsonFileReader();
         IJsonFileWriter writer = new LocalJsonFileWriter();
-
         _repository = new InventoryRepository(reader, writer);
 
         if (_repository.FileExists())
@@ -29,8 +30,8 @@ public class SaveLoadManager
 
             if (data != null)
             {
-                // Tell InventoryManager to do its thing with the loaded data
-                ServiceLocator.Get<InventoryManager>().ReconstructInventory(data);
+                // Tell InventoryManager to reconstruct the inventory based on the loaded data
+                _inventoryManager.ReconstructInventory(data);
                 NotificationBus.PostMessage("Inventory Loaded Successfully");
             }
             else
