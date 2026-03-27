@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public static class StackUtility
 {
-    public static bool AttemptMerge(ItemStack stackA, ItemStack stackB)
+    public static PlacementResult AttemptMerge(ItemStack stackA, ItemStack stackB)
     {
         // stackB is the source stack we want to merge into stackA (the target stack)
         if (stackA.ItemStored.ItemID == stackB.ItemStored.ItemID)
@@ -17,7 +17,7 @@ public static class StackUtility
             {
                 stackA.QuantityStored = totalQuantity;
                 stackB.QuantityStored = 0;
-                return true; // Fully merged
+                return PlacementResult.MergedFully;
             }
             else
             {
@@ -25,15 +25,15 @@ public static class StackUtility
 
                 if (spaceLeft == 0)
                 {
-                    return false; // Target is already full. Merge failed.
+                    return PlacementResult.FailedStackFull; // Target is already full. Merge failed.
                 }
 
                 stackA.QuantityStored += spaceLeft;
                 stackB.QuantityStored -= spaceLeft;
-                return true; // Partially merged
+                return PlacementResult.MergedPartially; // Partially merged
             }
         }
-        return false; // Different items. Merge failed.
+        return PlacementResult.FailedDiffItems; // Different items. Merge failed.
     }
     public static bool AttemptSplit(ItemStack originalStack, out ItemStack newStack)
     {

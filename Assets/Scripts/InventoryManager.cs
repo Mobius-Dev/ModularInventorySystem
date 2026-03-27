@@ -85,10 +85,12 @@ public class InventoryManager
     {
         PlacementResult placementResult = TryPlaceTileAt(targetSlot, tileToPlace);
         string itemName = tileToPlace.StackStored.ItemStored.ItemDisplayName;
+        string maxStackNo = tileToPlace.StackStored.ItemStored.MaxStackSize.ToString();
 
         switch (placementResult)
         {
             case PlacementResult.MergedFully:
+                UnityEngine.Object.Destroy(tileToPlace.gameObject);
                 NotificationBus.PostMessage($"Fully merged {itemName} into {targetSlot.name}.");
                 return;
 
@@ -102,7 +104,15 @@ public class InventoryManager
                 SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
                 return;
 
-            case PlacementResult.Failed:
+            case PlacementResult.FailedStackFull:
+                NotificationBus.PostMessage($"Could not place {itemName} in {targetSlot.name} because {itemName} already at max stack size of {maxStackNo}");
+                SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
+                return;
+
+            case PlacementResult.FailedDiffItems:
+                NotificationBus.PostMessage($"Could not place {itemName} in {targetSlot.name} because stacks of different items cannot be merged");
+                SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
+                return;
             default:
                 NotificationBus.PostMessage($"Could not place {itemName} in {targetSlot.name}.");
                 SnapTileBack(tileToPlace, tileToPlace.OriginalSlot);
@@ -198,19 +208,6 @@ public class InventoryManager
             return PlacementResult.MovedToEmpty;
         }
 
-        // Handle Occupied Slot (Attempt Merge)
-        if (!StackUtility.AttemptMerge(targetSlot.TileStored.StackStored, targetTile.StackStored))
-        {
-            return PlacementResult.Failed;
-        }
-
-        // Handle Cleanup
-        if (targetTile.StackStored.QuantityStored == 0)
-        {
-            UnityEngine.Object.Destroy(targetTile.gameObject);
-            return PlacementResult.MergedFully;
-        }
-
-        return PlacementResult.MergedPartially;
+        return StackUtility.AttemptMerge(targetSlot.TileStored.StackStored, targetTile.StackStored);
     }
 }
