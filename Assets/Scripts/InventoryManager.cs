@@ -90,7 +90,7 @@ public class InventoryManager
         switch (placementResult)
         {
             case PlacementResult.MergedFully:
-                UnityEngine.Object.Destroy(tileToPlace.gameObject);
+                ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
                 NotificationBus.PostMessage($"Fully merged {itemName} into {targetSlot.name}.");
                 return;
 
@@ -141,16 +141,18 @@ public class InventoryManager
     {
         if (tileToDestroy)
         {
-            UnityEngine.Object.Destroy(tileToDestroy.gameObject);
+            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToDestroy);
         }
     }
+
     public void EmptyAllSlots()
     {
         foreach (Slot slot in _allSlots)
         {
             if (slot.TileStored != null)
             {
-                UnityEngine.Object.Destroy(slot.TileStored.gameObject);
+                // Object.Destroy(slot.TileStored.gameObject);
+                ServiceLocator.Get<SpawnManager>().ReturnTileToPool(slot.TileStored);
                 slot.TileStored = null;
             }
         }
@@ -184,16 +186,17 @@ public class InventoryManager
     {
         if (slotIndex < 0 || slotIndex >= _allSlots.Count)
         {
-            Debug.LogError($"Invalid slot index {slotIndex} for placing loaded tile {tileToPlace.name}. This should never happen if the save/load system is working correctly.");
-            UnityEngine.Object.Destroy(tileToPlace.gameObject);
+            Debug.LogError($"Invalid slot index {slotIndex}...");
+            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
             return;
         }
 
         Slot targetSlot = _allSlots[slotIndex];
         if (targetSlot.TileStored != null)
         {
-            Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied by {targetSlot.TileStored.name}. This should never happen if the save/load system is working correctly. Destroying the tile to prevent issues.");
-            UnityEngine.Object.Destroy(tileToPlace.gameObject);
+            Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied...");
+            // Object.Destroy(tileToPlace.gameObject);
+            ServiceLocator.Get<SpawnManager>().ReturnTileToPool(tileToPlace);
             return;
         }
 

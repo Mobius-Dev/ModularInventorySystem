@@ -1,40 +1,78 @@
 using UnityEngine;
+using UnityEngine.Pool;
 
-/// <summary>
-/// A factory class containing functionality for spawning game tiles in the environment.
-/// </summary>
 public class SpawnManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _tilePrefab;
+    [Header("Pool Settings")]
+    [SerializeField] private Tile _tilePrefab;
+    [SerializeField] private int _defaultCapacity = 20;
+    [SerializeField] private int _maxSize = 100;
 
-    public void SpawnItem(ItemDef itemToSpawn, int quantityToSpawn)
+    private ObjectPool<Tile> _tilePool;
+
+    private void Awake()
     {
-        if (itemToSpawn == null)
-        {
-            Debug.LogWarning("Spawning a tile but no item selected.");
-            return;
-        }
+        // Initialize the pool
+        _tilePool = new ObjectPool<Tile>(
+            createFunc: CreatePooledItem,
+            actionOnGet: OnTakeFromPool,
+            actionOnRelease: OnReturnedToPool,
+            actionOnDestroy: OnDestroyPoolObject,
+            collectionCheck: true,
+            defaultCapacity: _defaultCapacity,
+            maxSize: _maxSize
+        );
+    }
 
-        if (itemToSpawn.MaxStackSize < quantityToSpawn)
-        {
-            quantityToSpawn = itemToSpawn.MaxStackSize;
-            Debug.LogWarning($"Requested quantity exceeds max stack size. Spawning {quantityToSpawn} instead.");
-        }
-
-        if (!ServiceLocator.Get<InventoryManager>().HasEmptySlot())
-        {
-            Debug.LogWarning("No empty slots available to spawn the item.");
-            return;
-        }
-
-        GameObject newTileObj = Instantiate(_tilePrefab);
-
-        Tile newTile = newTileObj.GetComponent<Tile>();
-        // Inject the dependencies
+    // --- POOL CALLBACKS ---
+    private Tile CreatePooledItem()
+    {
+        // Instantiate and inject dependencies ONLY ONCE when created
+        Tile newTile = Instantiate(_tilePrefab);
         newTile.Initialize(
             ServiceLocator.Get<InventoryManager>(),
             ServiceLocator.Get<DragManager>()
         );
+        return newTile;
+    }
+
+    private void OnTakeFromPool(Tile tile)
+    {
+        tile.gameObject.SetActive(true);
+        tile.SetRaycastBlocking(true); // Ensure it can be interacted with
+    }
+
+    private void OnReturnedToPool(Tile tile)
+    {
+        tile.Clear(); // Wipe data
+        tile.gameObject.SetActive(false);
+        tile.SetRaycastBlocking(false); // Prevent interaction while in pool
+    }
+
+    private void OnDestroyPoolObject(Tile tile)
+    {
+        Destroy(tile.gameObject); // Fallback if pool exceeds max size
+    }
+
+    // --- PUBLIC API ---
+    public void ReturnTileToPool(Tile tile)
+    {
+        _tilePool.Release(tile);
+    }
+
+    public void SpawnItem(ItemDef itemToSpawn, int quantityToSpawn)
+    {
+        if (itemToSpawn == null) return;
+
+        if (!ServiceLocator.Get<InventoryManager>().HasEmptySlot())
+        {
+            NotificationBus.PostMessage($"Inventory full! Cannot spawn {itemToSpawn.ItemDisplayName}.");
+            return;
+        }
+
+        if (itemToSpawn.MaxStackSize < quantityToSpawn) quantityToSpawn = itemToSpawn.MaxStackSize;
+
+        Tile newTile = _tilePool.Get();
 
         ItemStack debugStack = new ItemStack(itemToSpawn, quantityToSpawn);
         newTile.AssignStack(debugStack);
@@ -42,32 +80,20 @@ public class SpawnManager : MonoBehaviour
         ServiceLocator.Get<InventoryManager>().PlaceTileFromSpawn(newTile);
     }
 
-    public Tile SpawnTileFromSplitting(GameObject tileObjToClone, ItemStack stackToAssign, Transform parentTransform)
+    public Tile SpawnTileFromSplitting(Tile sourceTile, ItemStack stackToAssign, Transform parentTransform)
     {
-        GameObject newTileObj = Instantiate(tileObjToClone, parentTransform);
+        Tile newTile = _tilePool.Get(); // Get from pool
 
-        Tile newTile = newTileObj.GetComponent<Tile>();
-        // Inject the dependencies
-        newTile.Initialize(
-            ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>()
-        );
-
+        newTile.transform.SetParent(parentTransform);
+        newTile.transform.position = sourceTile.transform.position; // Snap visually to the source tile
         newTile.AssignStack(stackToAssign);
+
         return newTile;
     }
 
     public Tile SpawnTileFromLoad(ItemStack stackToAssign)
     {
-        GameObject newTileObj = Instantiate(_tilePrefab);
-
-        Tile newTile = newTileObj.GetComponent<Tile>();
-        // Inject the dependencies
-        newTile.Initialize(
-            ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>()
-        );
-
+        Tile newTile = _tilePool.Get(); // Get from pool
         newTile.AssignStack(stackToAssign);
         return newTile;
     }

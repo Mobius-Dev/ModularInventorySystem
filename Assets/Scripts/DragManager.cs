@@ -21,7 +21,7 @@ public class DragManager : MonoBehaviour
 
                 // Ask SpawnManager to create the new half
                 Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
-                    sourceTile.gameObject, splitStack, sourceTile.transform.parent);
+                    sourceTile, splitStack, sourceTile.transform.parent);
 
                 splitTile.OriginalSlot = sourceTile.OriginalSlot;
 

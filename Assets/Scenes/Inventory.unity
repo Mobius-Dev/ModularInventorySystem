@@ -2099,7 +2099,6 @@ GameObject:
   - component: {fileID: 687367615}
   - component: {fileID: 687367614}
   - component: {fileID: 687367613}
-  - component: {fileID: 687367616}
   m_Layer: 5
   m_Name: Dropdown_SpawnItem
   m_TagString: Untagged
@@ -2222,18 +2221,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 687367611}
   m_CullTransparentMesh: 1
---- !u!114 &687367616
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 687367611}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1b8afb550b883e46b2662b4756a91b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &698439736
 GameObject:
   m_ObjectHideFlags: 0
@@ -4162,7 +4149,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 373ab914a89a7b948aa5fb846e547a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tilePrefab: {fileID: 6540773721903186169, guid: 1f0bbb8cc59bb8344be6d3b1b78e4890, type: 3}
+  _tilePrefab: {fileID: 6751380971034870398, guid: 1f0bbb8cc59bb8344be6d3b1b78e4890, type: 3}
+  _defaultCapacity: 20
+  _maxSize: 100
 --- !u!224 &1474802230 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3738172545367369280, guid: 60d7efb8f07e483489ea400378be4366, type: 3}

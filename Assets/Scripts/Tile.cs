@@ -90,6 +90,23 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
         _canvasGroup.blocksRaycasts = blocks;
     }
 
+    public void Clear()
+    {
+        // Unsubscribe to prevent memory leaks and zombie events
+        if (StackStored != null)
+        {
+            StackStored.OnQuantityChanged -= HandleQuantityChanged;
+            StackStored = null;
+        }
+
+        OriginalSlot = null;
+
+        // Reset visuals to blank/default
+        _image.sprite = null;
+        _itemName.text = "";
+        _itemCount.text = "";
+    }
+
     private void HandleQuantityChanged(int quantity)
     {
         _itemCount.text = quantity.ToString();
