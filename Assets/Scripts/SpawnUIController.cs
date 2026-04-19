@@ -13,8 +13,18 @@ public class SpawnUIController : MonoBehaviour
     [Min(1)]
     [SerializeField] private int _quantityToSpawn = 1;
 
+    // Dependencies
+    ItemDatabase _itemDatabase;
+    SpawnManager _spawnManager;
+
     // We store the items matching the dropdown index so we know what they selected
     private List<ItemDef> _dropdownItems = new List<ItemDef>();
+
+    public void Initialize(ItemDatabase itemDatabase, SpawnManager spawnManager)
+    {
+        _itemDatabase = itemDatabase;
+        _spawnManager = spawnManager;
+    }
 
     private void Start()
     {
@@ -34,7 +44,7 @@ public class SpawnUIController : MonoBehaviour
         _dropdownItems.Clear();
 
         List<TMP_Dropdown.OptionData> uiOptions = new List<TMP_Dropdown.OptionData>();
-        var allItems = ServiceLocator.Get<ItemDatabase>().AllItems;
+        var allItems = _itemDatabase.AllItems;
 
         foreach (var item in allItems)
         {
@@ -54,7 +64,7 @@ public class SpawnUIController : MonoBehaviour
             ItemDef selectedItem = _dropdownItems[selectedIndex];
 
             // Ask the Logic manager to do the actual spawning
-            ServiceLocator.Get<SpawnManager>().SpawnItem(selectedItem, _quantityToSpawn);
+            _spawnManager.SpawnItem(selectedItem, _quantityToSpawn);
         }
     }
 }

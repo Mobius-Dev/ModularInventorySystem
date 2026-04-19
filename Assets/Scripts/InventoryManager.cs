@@ -157,7 +157,7 @@ public class InventoryManager
             if (slot.TileStored != null)
             {
                 // Object.Destroy(slot.TileStored.gameObject);
-                ServiceLocator.Get<SpawnManager>().ReturnTileToPool(slot.TileStored);
+                _spawnManager.ReturnTileToPool(slot.TileStored);
                 slot.TileStored = null;
             }
         }

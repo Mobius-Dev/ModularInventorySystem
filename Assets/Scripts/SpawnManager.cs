@@ -40,8 +40,8 @@ public class SpawnManager : MonoBehaviour
         // Instantiate and inject dependencies ONLY ONCE when created
         Tile newTile = Instantiate(_tilePrefab);
         newTile.Initialize(
-            ServiceLocator.Get<InventoryManager>(),
-            ServiceLocator.Get<DragManager>()
+            _inventoryManager,
+            _dragManager
         );
         return newTile;
     }
@@ -74,7 +74,7 @@ public class SpawnManager : MonoBehaviour
     {
         if (itemToSpawn == null) return;
 
-        if (!ServiceLocator.Get<InventoryManager>().HasEmptySlot())
+        if (_inventoryManager.HasEmptySlot() is false)
         {
             NotificationBus.PostMessage($"Inventory full! Cannot spawn {itemToSpawn.ItemDisplayName}.");
             return;
@@ -87,7 +87,7 @@ public class SpawnManager : MonoBehaviour
         ItemStack debugStack = new ItemStack(itemToSpawn, quantityToSpawn);
         newTile.AssignStack(debugStack);
 
-        ServiceLocator.Get<InventoryManager>().PlaceTileFromSpawn(newTile);
+        _inventoryManager.PlaceTileFromSpawn(newTile);
     }
 
     public Tile SpawnTileFromSplitting(Tile sourceTile, ItemStack stackToAssign, Transform parentTransform)

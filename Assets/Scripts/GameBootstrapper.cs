@@ -19,16 +19,33 @@ public class GameBootstrapper : MonoBehaviour
     private SaveLoadManager _saveLoadManager;
     private InventoryManager _inventoryManager;
 
+    [Header("UI Controllers (To be injected)")]
+    [SerializeField] private InventoryUIController _inventoryUI;
+    [SerializeField] private SaveLoadUIController _saveLoadUI;
+    [SerializeField] private SpawnUIController _spawnUI;
+    [SerializeField] private InventoryTrashBin _trashBin;
+
     [Header("Inventory Setup")]
     [SerializeField] private List<Slot> _sceneSlots = new List<Slot>();
 
     private void Awake()
     {
+        // Prepare database
         _itemDatabase.Initialize();
+
+        // Create pure C# managers
         _inventoryManager = new InventoryManager(_sceneSlots, _spawnManager, _itemDatabase);
         _saveLoadManager = new SaveLoadManager(_inventoryManager);
+
+        // Initialize Mono managers
         _spawnManager.Initialize(_inventoryManager, _dragManager);
         _dragManager.Initialize(_inputManager, _spawnManager, _inventoryManager);
+
+        // Inject Managers into UI Scene Objects
+        _inventoryUI.Initialize(_inventoryManager);
+        _saveLoadUI.Initialize(_saveLoadManager);
+        _spawnUI.Initialize(_itemDatabase, _spawnManager);
+        _trashBin.Initialize(_inventoryManager);
     }
 
 #if UNITY_EDITOR

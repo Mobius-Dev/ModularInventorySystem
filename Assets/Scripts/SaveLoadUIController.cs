@@ -7,6 +7,14 @@ public class SaveLoadUIController : MonoBehaviour
     [SerializeField] private Button _loadDataButton;
     [SerializeField] private Button _saveDataButton;
 
+    // Dependencies
+    private SaveLoadManager _saveLoadManager;
+
+    public void Initialize(SaveLoadManager saveLoadManager)
+    {
+        _saveLoadManager = saveLoadManager;
+    }
+
     private void Start()
     {
         if (_loadDataButton) _loadDataButton.onClick.AddListener(OnLoadClicked);
@@ -22,35 +30,26 @@ public class SaveLoadUIController : MonoBehaviour
     private async void OnLoadClicked()
     {
         _loadDataButton.interactable = false;
-
         try
         {
-            await ServiceLocator.Get<SaveLoadManager>().LoadInventoryDataAsync();
+            await _saveLoadManager.LoadInventoryDataAsync(); // NO MORE SERVICE LOCATOR
         }
         finally
         {
-            // Guaranteed to unlock the button no matter what happens
-            if (_loadDataButton != null)
-            {
-                _loadDataButton.interactable = true;
-            }
+            if (_loadDataButton != null) _loadDataButton.interactable = true;
         }
     }
 
     private async void OnSaveClicked()
     {
         _saveDataButton.interactable = false;
-
         try
         {
-            await ServiceLocator.Get<SaveLoadManager>().SaveInventoryDataAsync();
+            await _saveLoadManager.SaveInventoryDataAsync(); // NO MORE SERVICE LOCATOR
         }
         finally
         {
-            if (_saveDataButton != null)
-            {
-                _saveDataButton.interactable = true;
-            }
+            if (_saveDataButton != null) _saveDataButton.interactable = true;
         }
     }
 }

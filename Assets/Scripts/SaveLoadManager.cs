@@ -68,7 +68,7 @@ public class SaveLoadManager
     private InventorySaveData GenerateSaveData()
     {
         InventorySaveData saveData = new InventorySaveData();
-        IReadOnlyList<Slot> allSlots = ServiceLocator.Get<InventoryManager>().AllSlots;
+        IReadOnlyList<Slot> allSlots = _inventoryManager.AllSlots;
 
         // Iterate through slots, find the ones with tiles, and create ItemStackData
         for (int i = 0; i < allSlots.Count; i++)

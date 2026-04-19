@@ -998,6 +998,10 @@ MonoBehaviour:
   _spawnManager: {fileID: 1441589160}
   _dragManager: {fileID: 1914282541}
   _inputManager: {fileID: 1224683753}
+  _inventoryUI: {fileID: 1439350453}
+  _saveLoadUI: {fileID: 1276303487}
+  _spawnUI: {fileID: 1639090478}
+  _trashBin: {fileID: 1584805390}
   _sceneSlots:
   - {fileID: 1273084537}
   - {fileID: 541660852}

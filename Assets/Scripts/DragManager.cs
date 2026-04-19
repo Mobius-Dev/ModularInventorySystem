@@ -23,14 +23,14 @@ public class DragManager : MonoBehaviour
     public void HandleDragStart(Tile sourceTile, PointerEventData eventData)
     {
         // Splitting logic
-        if (ServiceLocator.Get<InputManager>().IsSplitModifierPressed())
+        if (_inputManager.IsSplitModifierPressed())
         {
             if (StackUtility.AttemptSplit(sourceTile.StackStored, out ItemStack splitStack))
             {
                 NotificationBus.PostMessage($"Split stack into {sourceTile.StackStored.QuantityStored} and {splitStack.QuantityStored}.");
 
                 // Ask SpawnManager to create the new half
-                Tile splitTile = ServiceLocator.Get<SpawnManager>().SpawnTileFromSplitting(
+                Tile splitTile = _spawnManager.SpawnTileFromSplitting(
                     sourceTile, splitStack, sourceTile.transform.parent);
 
                 splitTile.OriginalSlot = sourceTile.OriginalSlot;
@@ -49,7 +49,7 @@ public class DragManager : MonoBehaviour
         }
 
         // Normal drag logic (if no split modifier, or if splitting failed)
-        ServiceLocator.Get<InventoryManager>().ReleaseSlotFromTile(sourceTile);
+        _inventoryManager.ReleaseSlotFromTile(sourceTile);
         StartDragging(sourceTile, eventData);
     }
 
@@ -93,7 +93,7 @@ public class DragManager : MonoBehaviour
         // If the tile is still on the _dragLayer, it means the user dropped it in empty space
         if (tile.transform.parent == _dragLayer)
         {
-            ServiceLocator.Get<InventoryManager>().SnapTileBack(tile, tile.OriginalSlot);
+            _inventoryManager.SnapTileBack(tile, tile.OriginalSlot);
         }
 
         _currentTile = null;
