@@ -1948,7 +1948,6 @@ GameObject:
   - component: {fileID: 638626679}
   - component: {fileID: 638626681}
   - component: {fileID: 638626680}
-  - component: {fileID: 638626682}
   m_Layer: 5
   m_Name: Text_TrashBinArea
   m_TagString: Untagged
@@ -2074,18 +2073,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 638626678}
   m_CullTransparentMesh: 1
---- !u!114 &638626682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 638626678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b797d6d6b9ab064e81b7478b3032914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &683729086 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3738172545367369280, guid: 60d7efb8f07e483489ea400378be4366, type: 3}
