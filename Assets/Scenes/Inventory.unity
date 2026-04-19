@@ -960,7 +960,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 250563703}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5d8af8420dc2a44682c150baa0c7aba, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d2d8a0357cba3549a27218daba43ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _messageText: {fileID: 0}
@@ -998,7 +998,7 @@ MonoBehaviour:
   _spawnManager: {fileID: 1441589160}
   _dragManager: {fileID: 1914282541}
   _inputManager: {fileID: 1224683753}
-  _inventoryUI: {fileID: 1439350453}
+  _inventoryUI: {fileID: 1439350455}
   _saveLoadUI: {fileID: 1276303487}
   _spawnUI: {fileID: 1639090478}
   _trashBin: {fileID: 1584805390}
@@ -3479,12 +3479,12 @@ MonoBehaviour:
     m_Name: Split Modifier
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 42d6c6f6-4a7e-41fc-8132-b33c834eba22
+    m_Id: 270cffc1-aac9-4f03-b509-2ee68211fb23
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 
-      m_Id: ef5ac559-5664-4c1a-887d-1ad4b47dc8f9
+      m_Id: cdec2164-7db9-431d-98d5-c9f46612f06b
       m_Path: <Keyboard>/leftShift
       m_Interactions: 
       m_Processors: 
@@ -4024,7 +4024,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1439350454}
-  - component: {fileID: 1439350453}
+  - component: {fileID: 1439350455}
   m_Layer: 0
   m_Name: InventoryUIController
   m_TagString: Untagged
@@ -4032,19 +4032,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1439350453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1439350452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4987818795f175d4d94cf6046aa2b218, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _clearInventoryButton: {fileID: 216274478}
 --- !u!4 &1439350454
 Transform:
   m_ObjectHideFlags: 0
@@ -4060,6 +4047,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1329716372}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1439350455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439350452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b4fe32190a5d4f4183dc312752a9cec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _clearInventoryButton: {fileID: 216274478}
 --- !u!1 &1440574880
 GameObject:
   m_ObjectHideFlags: 0
@@ -4601,7 +4601,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1639090477}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5265bc622bd3e0942b51a7ce134b85ff, type: 3}
+  m_Script: {fileID: 11500000, guid: e8ccb39a9fbe70c4da62bf12c9140fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnTileButton: {fileID: 565215238}
