@@ -15,6 +15,7 @@ public class InventoryTrashBin : MonoBehaviour, IDropHandler
     {
         if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out Tile draggedTile))
         {
+            NotificationBus.PostMessage($"Deleted a stack of {draggedTile.StackStored.ItemStored.ItemDisplayName}");
             _inventoryManager.DestroyTile(draggedTile);
         }
     }

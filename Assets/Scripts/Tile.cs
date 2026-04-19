@@ -109,14 +109,6 @@ public class Tile : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHand
 
     private void HandleQuantityChanged(int quantity)
     {
-        if (quantity < 1)
-        {
-            // If quantity drops to 0 for any reason, tile is cleared and released, prevents "zombie" tiles without items
-            //Clear();
-            //_inventoryManager.ReleaseSlotFromTile(this);
-            //return;
-        }
-
         _itemCount.text = quantity.ToString();
     }
 }
