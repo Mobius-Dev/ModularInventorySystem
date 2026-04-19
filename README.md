@@ -45,7 +45,7 @@ Designed with adherence to SOLID principles, eliminating tightly-coupled monolit
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/modular-inventory.git
+   git clone https://github.com/Mobius-Dev/modular-inventory.git
    ```
 
 2. **Open in Unity 6.000.0.45f1 or later**
