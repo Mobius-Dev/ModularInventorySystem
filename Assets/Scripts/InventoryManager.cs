@@ -131,7 +131,7 @@ public class InventoryManager
         switch (placementResult)
         {
             case PlacementResult.MergedFully:
-                // Tile was fully merged, no need to place anything
+                _spawnManager.ReturnTileToPool(tileToPlace);
                 return;
             case PlacementResult.MovedToEmpty:
                 fallbackSlot.TileStored = tileToPlace;
@@ -156,7 +156,6 @@ public class InventoryManager
         {
             if (slot.TileStored != null)
             {
-                // Object.Destroy(slot.TileStored.gameObject);
                 _spawnManager.ReturnTileToPool(slot.TileStored);
                 slot.TileStored = null;
             }
@@ -200,7 +199,6 @@ public class InventoryManager
         if (targetSlot.TileStored != null)
         {
             Debug.LogError($"Trying to place loaded tile {tileToPlace.name} into slot {targetSlot.name} but it's already occupied...");
-            // Object.Destroy(tileToPlace.gameObject);
             _spawnManager.ReturnTileToPool(tileToPlace);
             return;
         }

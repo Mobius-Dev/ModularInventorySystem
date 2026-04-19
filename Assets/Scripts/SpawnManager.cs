@@ -34,7 +34,7 @@ public class SpawnManager : MonoBehaviour
         _dragManager = dragManager;
     }
 
-    // --- POOL CALLBACKS ---
+    // Pool Callbacks
     private Tile CreatePooledItem()
     {
         // Instantiate and inject dependencies ONLY ONCE when created
@@ -64,7 +64,7 @@ public class SpawnManager : MonoBehaviour
         Destroy(tile.gameObject); // Fallback if pool exceeds max size
     }
 
-    // --- PUBLIC API ---
+    // Public API
     public void ReturnTileToPool(Tile tile)
     {
         _tilePool.Release(tile);
